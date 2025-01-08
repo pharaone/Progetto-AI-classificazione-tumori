@@ -1,5 +1,9 @@
+from typing import Any
+
 import pandas as pd
 import sys
+
+from pandas import DataFrame
 
 from Preprocessing.Preprocessor import Preprocessor
 
@@ -35,10 +39,13 @@ class PreprocessorImplementation(Preprocessor):
         standardized_df[self.__class_column_name] = class_column
         return standardized_df
 
-    def preprocess(self) -> pd.DataFrame:
+    def get_targets_and_features(self, df: pd.DataFrame) -> tuple[DataFrame, DataFrame]:
+        return df.columns[self.__class_column_name], df.drop(columns=[self.__class_column_name])
+
+    def preprocess(self) -> tuple[DataFrame, DataFrame]:
         df = self.load_dataset()
         df = self.data_cleanup(df)
         df = self.data_standardization(df)
-        return df
+        return self.get_targets_and_features(df)
 
 
