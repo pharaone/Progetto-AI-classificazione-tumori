@@ -5,7 +5,7 @@ from pandas import DataFrame
 from Preprocessing.Preprocessor import Preprocessor
 
 """
-This class extends the Preprocessor class and implements it's preprocess method.
+This class implements the Preprocessor class and implements it's preprocess method.
 It does so by first loading the dataset from the input data path, cleaning up the data,
 standardizing it and splitting it into features and target variable.
 It has two variables: @__class_column_name which is the name of the column that will be used as 
