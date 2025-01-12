@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 
 from pandas import DataFrame
+from pandas import Series
 from Preprocessing.Preprocessor import Preprocessor
 
 """
@@ -76,7 +77,7 @@ class PreprocessorImplementation(Preprocessor):
     It does so by returning a tuple with one element containing the class column and the other one
     all the other columns.
     """
-    def get_targets_and_features(self, df: pd.DataFrame) -> tuple[DataFrame, DataFrame]:
+    def get_targets_and_features(self, df: pd.DataFrame) -> tuple[Series, DataFrame]:
         return df[self.__class_column_name], df.drop(columns=[self.__class_column_name])        # returns the tuple with one element containing the class
                                                                                                 # column and the other one all the other columns
     """
@@ -88,7 +89,7 @@ class PreprocessorImplementation(Preprocessor):
     3.  data_standardization() to standardize the dataframe
     4.  get_targets_and_features() which returns the target and features dataframes to called this method 
     """
-    def preprocess(self, data_path: str) -> tuple[DataFrame, DataFrame]:
+    def preprocess(self, data_path: str) -> tuple[Series, DataFrame]:
         self.__data_path = data_path                                        # give the datapath information to the local variable to be used by the other methods
 
         df = self.load_dataset()                                            # loads the dataset
