@@ -27,7 +27,8 @@ class Evaluator:
     dict: A dictionary containing the evaluation metrics.
     """
     def holdout_validation(self, training_percentage: float, k_neighbors: int):
-        x_train, y_train, x_test, y_test = self._split_data(training_percentage)    # Split the data into training and test sets
+        x_train, y_train, x_test, y_test = self.split_data(
+            training_percentage)  # Split the data into training and test sets
 
         knn = KnnAlgorithm(k_neighbors, x_train, y_train)                           # Initialize the KNN classifier
 
@@ -35,7 +36,7 @@ class Evaluator:
 
         return self.calculate_metrics(y_test, y_pred)                               # Calculate and return the evaluation metrics
 
-    def k_fold_cross_validation(self, k_times: int):
+    def k_fold_cross_validation(self, k_times: int, k_neighbors: int):
         features_subsets : [pd.DataFrame] = np.array_split(self.__features, k_times)
         targets_subsets : [pd.Series] = np.array_split(self.__targets, k_times)
 
@@ -46,8 +47,34 @@ class Evaluator:
         geometric_mean_rate_list = []
         area_under_the_curve_rate_list = []
 
+        for index in range(k_times):
+            features_set = features_subsets.copy().pop(index)
+            targets_set = targets_subsets.copy().pop(index)
+
+            knn = KnnAlgorithm(k_neighbors, features_set, targets_set)
+            y_prediction = knn.predict(features_subsets[index])
+
+            metrics = self.calculate_metrics(targets_set, y_prediction)
+
+            accuracy_rate_list.append(metrics['Accuracy Rate'])
+            error_rate_list.append(metrics['Error Rate'])
+            sensitivity_rate_list.append(metrics['Sensitivity'])
+            specificity_rate_list.append(metrics['Specificity'])
+            geometric_mean_rate_list.append(metrics['Geometric Mean'])
+            area_under_the_curve_rate_list.append(metrics['Area Under The Curve'])
+
+        metrics_dict = {'Accuracy Rate List': accuracy_rate_list,
+                        'Error Rate List': error_rate_list,
+                        'Sensitivity Rate List': sensitivity_rate_list,
+                        'Specificity Rate List': specificity_rate_list,
+                        'Geometric Mean Rate List': geometric_mean_rate_list,
+                        'Area Under The Curve Rate List': area_under_the_curve_rate_list
+                        }
+
+        self.save_metrics(metrics_dict)
+
     def stratified_cross_validation(self, k_times: int):
-        pass
+         pass
 
     """
     Calculates the main evaluation metrics for the KNN model: 
@@ -85,6 +112,9 @@ class Evaluator:
 
         return metrics
 
+    def save_metrics(self, metrics: dict):
+        pass
+
     """
     Splits the data into training and test sets based on the training percentage.
 
@@ -94,7 +124,7 @@ class Evaluator:
     Returns:
     tuple: The training (x_train, y_train) and test (x_test, y_test) data sets.
     """
-    def _split_data(self, training_percentage: float):
+    def split_data(self, training_percentage: float):
         split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
 
         x_train = self.__features.iloc[:split_index]                    # Extract the training and test data

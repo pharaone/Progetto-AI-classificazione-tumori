@@ -23,7 +23,7 @@ class KnnAlgorithm:
     :param x: The point for which to find neighbors.
     :return: The labels of the k nearest neighbors.
     """
-    def _get_neighbors(self, x):
+    def get_neighbors(self, x):
         distance_creator = EuclideanDistanceCreator()                   # Create an instance of the factory for calculating Euclidean distance.
         distance_strategy = distance_creator.create_distance()          # Create the distance calculation strategy (EuclideanDistance).
         distances = [distance_strategy.calculate(x, x_train_sample)     # Calculate the distances between point x and all training samples.
@@ -39,7 +39,7 @@ class KnnAlgorithm:
     def predict(self, x_test):
         predictions = []                                                                    # Initialize an empty list to store predictions.
         for x in x_test:                                                                    # For each point in the test data
-            neighbors = self._get_neighbors(x)                                              # Get the labels of the nearest neighbors.
+            neighbors = self.get_neighbors(x)  # Get the labels of the nearest neighbors.
             label_counts = Counter(neighbors)                                               # Count the frequency of each label among the neighbors.
             most_common = label_counts.most_common()                                        # Get the most common labels sorted by frequency.
             max_count = most_common[0][1]                                                   # Determine the highest frequency among the labels.
