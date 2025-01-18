@@ -1,4 +1,5 @@
 import random
+import sys
 from collections import Counter
 
 import numpy as np
@@ -26,16 +27,20 @@ class KnnAlgorithm:
     """
 
     def get_neighbors(self, x: pd.Series):
-        distance_creator = EuclideanDistanceCreator()               # Create an instance of the factory for calculating Euclidean distance.
-        distance_strategy = distance_creator.create_distance()      # Create the distance calculation strategy (EuclideanDistance).
-        distances = []
+        try:
+            distance_creator = EuclideanDistanceCreator()               # Create an instance of the factory for calculating Euclidean distance.
+            distance_strategy = distance_creator.create_distance()      # Create the distance calculation strategy (EuclideanDistance).
+            distances = []
 
-        for _, x_train_sample in self.x_train.iterrows():           # Iterating through each row in the training data (x_train is a DataFrame)
-            distance = distance_strategy.calculate(x,
-                                                   x_train_sample)  # Calculate distance between the test point `x` and the current training sample `x_train_sample`
-            distances.append(distance)
+            for _, x_train_sample in self.x_train.iterrows():           # Iterating through each row in the training data (x_train is a DataFrame)
+                distance = distance_strategy.calculate(x,
+                                                       x_train_sample)  # Calculate distance between the test point `x` and the current training sample `x_train_sample`
+                distances.append(distance)
 
-        k_indices = np.argsort(distances)[:self.k]                  # Sort distances and get the indices of the k smallest
+            k_indices = np.argsort(distances)[:self.k]                  # Sort distances and get the indices of the k smallest
+        except Exception as e:                                          # handles  exception
+            print(e)                                                    # prints the exception
+            sys.exit('Error to get the neighbors.')
         return self.y_train.iloc[k_indices]                         # Return the labels of the k closest points
 
     """
@@ -46,18 +51,21 @@ class KnnAlgorithm:
     """
 
     def predict(self, x_test: pd.DataFrame):
-        predictions = []                                # Initialize an empty list to store predictions
+        try:
+            predictions = []                                # Initialize an empty list to store predictions
+
+            for _, x in x_test.iterrows():                  # Iterating through each test point in the dataset
+                neighbors = self.get_neighbors(x)           # Get the labels of the nearest neighbors
+
+                label_counts = Counter(neighbors)           # Count the frequency of each label among the neighbors
+                most_common = label_counts.most_common()    # Get the most common labels sorted by frequency
+                max_count = most_common[0][1]               # Determine the highest frequency among the labels
 
 
-        for _, x in x_test.iterrows():                  # Iterating through each test point in the dataset
-            neighbors = self.get_neighbors(x)           # Get the labels of the nearest neighbors
-
-            label_counts = Counter(neighbors)           # Count the frequency of each label among the neighbors
-            most_common = label_counts.most_common()    # Get the most common labels sorted by frequency
-            max_count = most_common[0][1]               # Determine the highest frequency among the labels
-
-
-            candidates = [label for label, count in most_common if count == max_count]  # Select all labels with the highest frequency (in case of ties)
-            predictions.append(random.choice(candidates))                               # If there's a tie, randomly choose one of the candidate labels
+                candidates = [label for label, count in most_common if count == max_count]  # Select all labels with the highest frequency (in case of ties)
+                predictions.append(random.choice(candidates))                               # If there's a tie, randomly choose one of the candidate labels
+        except Exception as e:                               # handles  exception
+            print(e)                                         # prints the exception
+            sys.exit('Error to predict the label.')
 
         return np.array(predictions)
