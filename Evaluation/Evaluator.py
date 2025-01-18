@@ -59,7 +59,7 @@ class Evaluator:
             sensitivity_rate_list.append(metrics['Sensitivity'])
             specificity_rate_list.append(metrics['Specificity'])
             geometric_mean_rate_list.append(metrics['Geometric Mean'])
-            area_under_the_curve_rate_list.append(metrics['Area Under The Curve'])
+            area_under_the_curve_rate_list.append(metrics['Area Under the Curve'])
 
         metrics_dict = {'Accuracy Rate List': accuracy_rate_list,
                         'Error Rate List': error_rate_list,
@@ -151,7 +151,9 @@ class Evaluator:
         return metrics
 
     def save_metrics(self, metrics: dict):
-        pass
+        import json
+        with open('result.json', 'w') as fp:
+            json.dump(metrics, fp)
 
     """
     Splits the data into training and test sets based on the training percentage.
