@@ -16,23 +16,15 @@ class Evaluator:
         self.__targets = targets
 
     """
-    Performs a model validation using the holdout data split method. 
-    Divides the data into a training set and a test set, trains a KNN model, 
-    and calculates the evaluation metrics on the test set.
-
-    Args:
-    training_percentage (float): The percentage of data to use for training (0-1).
-    k_neighbors (int): The number of neighbors to consider in the KNN model.
-
-    Returns:
-    dict: A dictionary containing the evaluation metrics.
+    Divides the dataset into training and test sets using the given percentage. 
+    Trains the KNN model on the training set and evaluates its predictions on the test set.
+    At the end calculate metrics that are crucial to understanding the model's overall performance
     """
     def holdout_validation(self, training_percentage: float, k_neighbors: int):
         x_train, y_train, x_test, y_test = self.split_data(
-            training_percentage)  # Split the data into training and test sets
+            training_percentage)                                                    # Split the data into training and test sets
 
         knn = KnnAlgorithm(k_neighbors, x_train, y_train)                           # Initialize the KNN classifier
-
         y_pred = knn.predict(x_test)                                                # Make predictions on the test data
 
         return self.calculate_metrics(y_test, y_pred)                               # Calculate and return the evaluation metrics
@@ -128,13 +120,6 @@ class Evaluator:
     Calculates the main evaluation metrics for the KNN model: 
     Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean, 
     and Area Under the Curve (AUC).
-
-    Args:
-    y_test (pd.Series): The true target values in the test set.
-    y_pred (pd.Series): The predicted values from the KNN model.
-
-    Returns:
-    dict: A dictionary containing the calculated evaluation metrics.
     """
     def calculate_metrics(self, y_test, y_pred):
         true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)                               # Initialize variables for metric calculations
@@ -165,12 +150,6 @@ class Evaluator:
 
     """
     Splits the data into training and test sets based on the training percentage.
-
-    Args:
-    training_percentage (float): The percentage of data to use for training (0-1).
-
-    Returns:
-    tuple: The training (x_train, y_train) and test (x_test, y_test) data sets.
     """
     def split_data(self, training_percentage: float):
         split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
