@@ -56,12 +56,12 @@ class Evaluator:
             geometric_mean_rate_list.append(metrics['Geometric Mean'])
             area_under_the_curve_rate_list.append(metrics['Area Under the Curve'])
 
-        metrics_dict = {'Accuracy Rate List': accuracy_rate_list,
-                        'Error Rate List': error_rate_list,
-                        'Sensitivity Rate List': sensitivity_rate_list,
-                        'Specificity Rate List': specificity_rate_list,
-                        'Geometric Mean Rate List': geometric_mean_rate_list,
-                        'Area Under The Curve Rate List': area_under_the_curve_rate_list
+        metrics_dict = {'Accuracy Rate List': np.mean(accuracy_rate_list),
+                        'Error Rate List': np.mean(error_rate_list),
+                        'Sensitivity Rate List': np.mean(sensitivity_rate_list),
+                        'Specificity Rate List': np.mean(specificity_rate_list),
+                        'Geometric Mean Rate List': np.mean(geometric_mean_rate_list),
+                        'Area Under The Curve Rate List': np.mean(area_under_the_curve_rate_list)
                         }
 
         self.save_metrics(metrics_dict)
@@ -106,12 +106,12 @@ class Evaluator:
             geometric_mean_rate_list.append(metrics['Geometric Mean'])
             area_under_the_curve_rate_list.append(metrics['Area Under The Curve'])
 
-        metrics_dict = {'Accuracy Rate List': accuracy_rate_list,
-                        'Error Rate List': error_rate_list,
-                        'Sensitivity Rate List': sensitivity_rate_list,
-                        'Specificity Rate List': specificity_rate_list,
-                        'Geometric Mean Rate List': geometric_mean_rate_list,
-                        'Area Under The Curve Rate List': area_under_the_curve_rate_list
+        metrics_dict = {'Accuracy Rate List': np.mean(accuracy_rate_list),
+                        'Error Rate List': np.mean(error_rate_list),
+                        'Sensitivity Rate List': np.mean(sensitivity_rate_list),
+                        'Specificity Rate List': np.mean(specificity_rate_list),
+                        'Geometric Mean Rate List': np.mean(geometric_mean_rate_list),
+                        'Area Under The Curve Rate List': np.mean(area_under_the_curve_rate_list)
                         }
 
         self.save_metrics(metrics_dict)
@@ -146,9 +146,9 @@ class Evaluator:
         return metrics
 
     def save_metrics(self, metrics: dict):
-        import json
-        with open('result.json', 'w') as fp:
-            json.dump(metrics, fp)
+        import csv
+        with open('result.csv', 'w') as fp:
+            csv.writer(fp).writerows(metrics.items())
 
     """
     Splits the data into training and test sets based on the training percentage.
