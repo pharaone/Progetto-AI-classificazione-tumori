@@ -1,3 +1,4 @@
+import sys
 from math import sqrt
 
 import pandas as pd
@@ -21,13 +22,17 @@ class Evaluator:
     At the end calculate metrics that are crucial to understanding the model's overall performance
     """
     def holdout_validation(self, training_percentage: float, k_neighbors: int):
-        x_train, y_train, x_test, y_test = self.split_data(
-            training_percentage)                                                    # Split the data into training and test sets
+        try:
+            x_train, y_train, x_test, y_test = self.split_data(
+                training_percentage)                                # Split the data into training and test sets
 
-        knn = KnnAlgorithm(k_neighbors, x_train, y_train)                           # Initialize the KNN classifier
-        y_pred = knn.predict(x_test)                                                # Make predictions on the test data
+            knn = KnnAlgorithm(k_neighbors, x_train, y_train)       # Initialize the KNN classifier
+            y_pred = knn.predict(x_test)                            # Make predictions on the test data
+        except Exception as e:                                      # handles every other exception
+            print(e)                                                # prints the exception
+            sys.exit('Error to use holdout_validation.')
 
-        return self.calculate_metrics(y_test, y_pred)                               # Calculate and return the evaluation metrics
+        return self.calculate_metrics(y_test, y_pred)               # Calculate and return the evaluation metrics
 
     def k_fold_cross_validation(self, k_times: int, k_neighbors: int):
         features_subsets : [pd.DataFrame] = np.array_split(self.__features, k_times)
@@ -152,11 +157,15 @@ class Evaluator:
     Splits the data into training and test sets based on the training percentage.
     """
     def split_data(self, training_percentage: float):
-        split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
+        try:
+            split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
 
-        x_train = self.__features.iloc[:split_index]                    # Extract the training and test data
-        y_train = self.__targets.iloc[:split_index]
-        x_test = self.__features.iloc[split_index:]
-        y_test = self.__targets.iloc[split_index:]
+            x_train = self.__features.iloc[:split_index]                    # Extract the training and test data
+            y_train = self.__targets.iloc[:split_index]
+            x_test = self.__features.iloc[split_index:]
+            y_test = self.__targets.iloc[split_index:]
+        except Exception as e:                              # handles every other exception
+            print(e)                                        # prints the exception
+            sys.exit('Error to split data.')
 
         return x_train, y_train, x_test, y_test
