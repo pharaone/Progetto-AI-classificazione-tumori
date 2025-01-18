@@ -2,6 +2,7 @@ from math import sqrt
 
 import pandas as pd
 import numpy as np
+from pandas.core.interchange.dataframe_protocol import DataFrame
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
@@ -73,8 +74,55 @@ class Evaluator:
 
         self.save_metrics(metrics_dict)
 
-    def stratified_cross_validation(self, k_times: int):
-         pass
+    def stratified_cross_validation(self, k_times: int, k_neighbors: int):
+        unified_features_and_targets = self.__features.copy()
+        unified_features_and_targets['targets'] = self.__targets.copy()
+        unified_features_and_targets.sort_values(by=['targets'], inplace=True)
+
+        benign_dataset = unified_features_and_targets[unified_features_and_targets['targets'] == 2.0]
+        malign_dataset = unified_features_and_targets[unified_features_and_targets['targets'] == 4.0]
+
+        benign_targets = np.array_split(benign_dataset['targets'], k_times)
+        malign_targets = np.array_split(malign_dataset['targets'], k_times)
+
+        benign_dataset = benign_dataset.drop(columns=['targets'], inplace=True)
+        malign_dataset = malign_dataset.drop(columns=['targets'], inplace=True)
+
+        benign_subsets: [pd.DataFrame] = np.array_split(benign_dataset, k_times)
+        malign_subsets: [pd.DataFrame] = np.array_split(malign_dataset, k_times)
+
+        accuracy_rate_list = []
+        error_rate_list = []
+        sensitivity_rate_list = []
+        specificity_rate_list = []
+        geometric_mean_rate_list = []
+        area_under_the_curve_rate_list = []
+
+        for index in range(k_times):
+            features_set = benign_subsets.copy().pop(index) + malign_subsets.copy().pop(index)
+            targets_set = benign_targets.copy().pop(index) + malign_targets.copy().pop(index)
+
+            knn = KnnAlgorithm(k_neighbors, features_set, targets_set)
+            y_prediction = knn.predict(benign_subsets[index] + malign_subsets[index])
+
+            metrics = self.calculate_metrics(targets_set, y_prediction)
+
+            accuracy_rate_list.append(metrics['Accuracy Rate'])
+            error_rate_list.append(metrics['Error Rate'])
+            sensitivity_rate_list.append(metrics['Sensitivity'])
+            specificity_rate_list.append(metrics['Specificity'])
+            geometric_mean_rate_list.append(metrics['Geometric Mean'])
+            area_under_the_curve_rate_list.append(metrics['Area Under The Curve'])
+
+        metrics_dict = {'Accuracy Rate List': accuracy_rate_list,
+                        'Error Rate List': error_rate_list,
+                        'Sensitivity Rate List': sensitivity_rate_list,
+                        'Specificity Rate List': specificity_rate_list,
+                        'Geometric Mean Rate List': geometric_mean_rate_list,
+                        'Area Under The Curve Rate List': area_under_the_curve_rate_list
+                        }
+
+        self.save_metrics(metrics_dict)
 
     """
     Calculates the main evaluation metrics for the KNN model: 
