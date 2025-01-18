@@ -15,7 +15,7 @@ the target variable, and a default data path in @__data_path.
 class PreprocessorImplementation(Preprocessor):
     __class_column_name = 'classtype_v1'        # name of the column that will be used as  the target variable
     __data_path = 'input.csv'                   # default (placeholder) data path
-
+    __final_table_columns = ['Mitoses','Normal Nucleoli','Single Epithelial Cell Size','uniformity_cellsize_xx','clump_thickness_ty','Marginal Adhesion','Bland Chromatin','classtype_v1','Uniformity of Cell Shape','bareNucleix_wrong']
     """
     Empty class constructor that creates a new class instance
     """
@@ -49,7 +49,7 @@ class PreprocessorImplementation(Preprocessor):
     It also removes all na rows and finally returns the dataframe.
     """
     def data_cleanup(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = df.drop(columns=['Sample code number'])            # drops not useful 'Sample code number' column
+        df = df[df.columns.intersection(self.__final_table_columns)]          # drops not useful 'Sample code number' column
         df = df.apply(pd.to_numeric, errors='coerce')           # drops all non-numeric rows
         df = df.dropna()                                        # drops the rows with NA values
         return df                                               # returns the dataframe
