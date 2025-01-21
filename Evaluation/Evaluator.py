@@ -11,10 +11,15 @@ from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 class Evaluator:
     __features : pd.DataFrame = None
     __targets : pd.Series = None
+    __metrics: list = None
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list = None):
         self.__features = features
         self.__targets = targets
+        self.__metrics = metrics if metrics is not None else [
+            "Accuracy Rate", "Error Rate", "Sensitivity", "Specificity",
+            "Geometric Mean", "Area Under the Curve"
+        ]
 
     """
     Divides the dataset into training and test sets using the given percentage. 
@@ -24,15 +29,15 @@ class Evaluator:
     def holdout_validation(self, training_percentage: float, k_neighbors: int):
         try:
             x_train, y_train, x_test, y_test = self.split_data(
-                training_percentage)                                # Split the data into training and test sets
+                training_percentage)                                    # Split the data into training and test sets
 
-            knn = KnnAlgorithm(k_neighbors, x_train, y_train)       # Initialize the KNN classifier
-            y_pred = knn.predict(x_test)                            # Make predictions on the test data
-        except Exception as e:                                      # handles every other exception
-            print(e)                                                # prints the exception
+            knn = KnnAlgorithm(k_neighbors, x_train, y_train)           # Initialize the KNN classifier
+            y_pred = knn.predict(x_test)                                # Make predictions on the test data
+        except Exception as e:                                          # handles every other exception
+            print(e)                                                    # prints the exception
             sys.exit('Error to use holdout_validation.')
 
-        return self.calculate_metrics(y_test, y_pred)               # Calculate and return the evaluation metrics
+        return self.calculate_metrics(y_test, y_pred, self.__metrics)   # Calculate and return the evaluation metrics
 
     def k_fold_cross_validation(self, k_times: int, k_neighbors: int):
         features_subsets : [pd.DataFrame] = np.array_split(self.__features, k_times)
@@ -124,31 +129,44 @@ class Evaluator:
     """
     Calculates the main evaluation metrics for the KNN model: 
     Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean, 
-    and Area Under the Curve (AUC).
+    and Area Under the Curve (AUC), it's possible choose the matrics or all the matrics.
     """
-    def calculate_metrics(self, y_test, y_pred):
-        true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)                               # Initialize variables for metric calculations
-        true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
-        false_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 4)
-        false_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 2)
+    def calculate_metrics(self, y_test, y_pred, selected_metrics=None):
+        try:
+            true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)   # Calculate the confusion matrix
+            true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
+            false_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 4)
+            false_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 2)
 
-        accuracy = (true_positive + true_negative) / len(y_test)                                                        # Calculate accuracy
-        error_rate = 1 - accuracy                                                                                       # Calculate error rate
-        sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0   # Calculate sensitivity (true positive rate)
-        specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0   # Calculate specificity (true negative rate)
-        geometric_mean = sqrt(sensitivity * specificity)                                                                # Calculate the geometric mean of sensitivity and specificity
-        auc = (sensitivity + specificity) / 2                                                                           # Calculate the Area Under the Curve (AUC)
+            total = true_positive + true_negative + false_positive + false_negative
+            accuracy = (true_positive + true_negative) / total if total > 0 else 0
+            error_rate = (false_positive + false_negative) / total if total > 0 else 0
+            sensitivity = true_positive / (true_positive + false_negative) \
+                if (true_positive + false_negative) > 0 else 0
+            specificity = true_negative / (true_negative + false_positive) \
+                if (true_negative + false_positive) > 0 else 0
+            geometric_mean = sqrt(sensitivity * specificity)
+            auc = (sensitivity + specificity) / 2
 
-        metrics = {                                                                                                     # Create a dictionary with the calculated metrics
-            "Accuracy Rate": accuracy,
-            "Error Rate": error_rate,
-            "Sensitivity": sensitivity,
-            "Specificity": specificity,
-            "Geometric Mean": geometric_mean,
-            "Area Under the Curve": auc,
-        }
+            all_metrics = {                                                                      # Store all computed metrics in a dictionary
+                "Accuracy Rate": accuracy,
+                "Error Rate": error_rate,
+                "Sensitivity": sensitivity,
+                "Specificity": specificity,
+                "Geometric Mean": geometric_mean,
+                "Area Under the Curve": auc,
+            }
 
-        return metrics
+            if selected_metrics:                                                                 # If specific metrics are requested, filter and return them
+                result_metrics = {}                                                              # Initialize empty dictionary
+                for metric in selected_metrics:
+                    if metric in all_metrics:
+                        result_metrics[metric] = all_metrics[metric]                             # Add selected metrics
+                return result_metrics                                                            # Return selected metrics
+            return all_metrics                                                                   # Return all metrics if none specified
+        except Exception as e:                                                                   # handles exception
+            print(e)                                                                             # prints the exception
+            sys.exit('Error to split data.')
 
     def save_metrics(self, metrics: dict):
         import json
@@ -166,7 +184,7 @@ class Evaluator:
             y_train = self.__targets.iloc[:split_index]
             x_test = self.__features.iloc[split_index:]
             y_test = self.__targets.iloc[split_index:]
-        except Exception as e:                              # handles every other exception
+        except Exception as e:                              # handles exception
             print(e)                                        # prints the exception
             sys.exit('Error to split data.')
 

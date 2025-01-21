@@ -18,3 +18,12 @@ L'utente durante l'esecuzione del programma deve fornire dei parametri per speci
   - come valutare il modello, se in Holdout, in K-fold Cross Validation e Stratified Cross Validation
     - se non sceglie l' Holdout deve specificare K (numero di esperimenti)
   - quali metriche vuole che siano validate   
+
+**k-nearest neighbors Algorithm (KNN)**
+
+L'algoritmo dei **k-nearest neighbors (KNN)** è un metodo di classificazione supervisionata che assegna una categoria a un oggetto basandosi sulla similarità con altri oggetti già etichettati nel dataset. Per effettuare la classificazione, KNN calcola la distanza tra il punto da classificare e tutti gli altri punti del dataset, identificando quelli più vicini.
+
+Per determinare i vicini più prossimi, l'algoritmo utilizza diverse metriche di distanza, tra cui la distanza euclidea, che è frequentemente scelta per la sua semplicità ed efficacia.
+
+Il parametro "k" rappresenta il numero di vicini da prendere in considerazione per il processo di classificazione. Se si imposta k=1, l'oggetto da classificare viene associato alla categoria del punto più vicino.
+La scelta ottimale di "k" è cruciale per bilanciare correttamente l'accuratezza del modello e la sua capacità di generalizzazione. La determinazione di questo valore dipende dalla distribuzione e dalla variabilità dei dati, richiedendo spesso un'analisi empirica per individuare il compromesso ideale.
