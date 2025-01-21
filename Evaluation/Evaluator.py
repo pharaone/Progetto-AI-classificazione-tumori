@@ -74,8 +74,8 @@ class Evaluator:
         benign_targets = np.array_split(benign_dataset['targets'], k_times)
         malign_targets = np.array_split(malign_dataset['targets'], k_times)
 
-        benign_dataset = benign_dataset.drop(columns=['targets'], inplace=True)
-        malign_dataset = malign_dataset.drop(columns=['targets'], inplace=True)
+        benign_dataset = benign_dataset.drop(columns=['targets'])
+        malign_dataset = malign_dataset.drop(columns=['targets'])
 
         benign_subsets: [pd.DataFrame] = np.array_split(benign_dataset, k_times)
         malign_subsets: [pd.DataFrame] = np.array_split(malign_dataset, k_times)
@@ -83,11 +83,11 @@ class Evaluator:
         metrics = []
 
         for index in range(k_times):
-            features_set = benign_subsets.copy().pop(index) + malign_subsets.copy().pop(index)
-            targets_set = benign_targets.copy().pop(index) + malign_targets.copy().pop(index)
+            features_set = pd.concat([benign_subsets.copy().pop(index), malign_subsets.copy().pop(index)])
+            targets_set = pd.concat([benign_targets.copy().pop(index), malign_targets.copy().pop(index)])
 
             knn = KnnAlgorithm(k_neighbors, features_set, targets_set)
-            y_prediction = knn.predict(benign_subsets[index] + malign_subsets[index])
+            y_prediction = knn.predict(pd.concat([benign_subsets[index], malign_subsets[index]]))
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))
 
