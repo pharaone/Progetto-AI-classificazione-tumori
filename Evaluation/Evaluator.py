@@ -11,6 +11,7 @@ from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 class Evaluator:
     __features : pd.DataFrame = None
     __targets : pd.Series = None
+    """
     __metrics_map = {
         "1": "Accuracy Rate",
         "2": "Error Rate",
@@ -18,15 +19,14 @@ class Evaluator:
         "4": "Specificity",
         "5": "Geometric Mean",
         "6": "Area Under the Curve"
+        "7": "All the above"
     }
+    """
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[int]):
         self.__features = features
         self.__targets = targets
-        if metrics is 7:
-            self.__metrics = list(self.__metrics_map.values())
-        else:
-            self.__metrics = [self.__metrics_map[m] for m in metrics if m in self.__metrics_map]
+        self.__metrics = metrics
 
     """
     Divides the dataset into training and test sets using the given percentage. 
@@ -44,18 +44,13 @@ class Evaluator:
             print(e)                                                    # prints the exception
             sys.exit('Error to use holdout_validation.')
 
-        return self.calculate_metrics(y_test, y_pred, self.__metrics)   # Calculate and return the evaluation metrics
+        self.save_metrics(self.calculate_metrics(y_test, y_pred))       # Calculate and return the evaluation metrics
 
     def k_fold_cross_validation(self, k_times: int, k_neighbors: int):
         features_subsets : [pd.DataFrame] = np.array_split(self.__features, k_times)
         targets_subsets : [pd.Series] = np.array_split(self.__targets, k_times)
 
-        accuracy_rate_list = []
-        error_rate_list = []
-        sensitivity_rate_list = []
-        specificity_rate_list = []
-        geometric_mean_rate_list = []
-        area_under_the_curve_rate_list = []
+        metrics = []
 
         for index in range(k_times):
             features_set = features_subsets.copy().pop(index)
@@ -64,24 +59,9 @@ class Evaluator:
             knn = KnnAlgorithm(k_neighbors, features_set, targets_set)
             y_prediction = knn.predict(features_subsets[index])
 
-            metrics = self.calculate_metrics(targets_set, y_prediction)
+            metrics.append(self.calculate_metrics(targets_set, y_prediction))
 
-            accuracy_rate_list.append(metrics['Accuracy Rate'])
-            error_rate_list.append(metrics['Error Rate'])
-            sensitivity_rate_list.append(metrics['Sensitivity'])
-            specificity_rate_list.append(metrics['Specificity'])
-            geometric_mean_rate_list.append(metrics['Geometric Mean'])
-            area_under_the_curve_rate_list.append(metrics['Area Under the Curve'])
-
-        metrics_dict = {'Accuracy Rate List': np.mean(accuracy_rate_list),
-                        'Error Rate List': np.mean(error_rate_list),
-                        'Sensitivity Rate List': np.mean(sensitivity_rate_list),
-                        'Specificity Rate List': np.mean(specificity_rate_list),
-                        'Geometric Mean Rate List': np.mean(geometric_mean_rate_list),
-                        'Area Under The Curve Rate List': np.mean(area_under_the_curve_rate_list)
-                        }
-
-        self.save_metrics(metrics_dict)
+        self.save_metrics_from_metrics_list(metrics)
 
     def stratified_cross_validation(self, k_times: int, k_neighbors: int):
         unified_features_and_targets = self.__features.copy()
@@ -100,12 +80,7 @@ class Evaluator:
         benign_subsets: [pd.DataFrame] = np.array_split(benign_dataset, k_times)
         malign_subsets: [pd.DataFrame] = np.array_split(malign_dataset, k_times)
 
-        accuracy_rate_list = []
-        error_rate_list = []
-        sensitivity_rate_list = []
-        specificity_rate_list = []
-        geometric_mean_rate_list = []
-        area_under_the_curve_rate_list = []
+        metrics = []
 
         for index in range(k_times):
             features_set = benign_subsets.copy().pop(index) + malign_subsets.copy().pop(index)
@@ -114,62 +89,53 @@ class Evaluator:
             knn = KnnAlgorithm(k_neighbors, features_set, targets_set)
             y_prediction = knn.predict(benign_subsets[index] + malign_subsets[index])
 
-            metrics = self.calculate_metrics(targets_set, y_prediction)
+            metrics.append(self.calculate_metrics(targets_set, y_prediction))
 
-            accuracy_rate_list.append(metrics['Accuracy Rate'])
-            error_rate_list.append(metrics['Error Rate'])
-            sensitivity_rate_list.append(metrics['Sensitivity'])
-            specificity_rate_list.append(metrics['Specificity'])
-            geometric_mean_rate_list.append(metrics['Geometric Mean'])
-            area_under_the_curve_rate_list.append(metrics['Area Under The Curve'])
 
-        metrics_dict = {'Accuracy Rate List': np.mean(accuracy_rate_list),
-                        'Error Rate List': np.mean(error_rate_list),
-                        'Sensitivity Rate List': np.mean(sensitivity_rate_list),
-                        'Specificity Rate List': np.mean(specificity_rate_list),
-                        'Geometric Mean Rate List': np.mean(geometric_mean_rate_list),
-                        'Area Under The Curve Rate List': np.mean(area_under_the_curve_rate_list)
-                        }
-
-        self.save_metrics(metrics_dict)
+        self.save_metrics_from_metrics_list(metrics)
 
     """
     Calculates the main evaluation metrics for the KNN model: 
     Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean, 
     and Area Under the Curve (AUC), it's possible choose the matrics or all the matrics.
     """
-    def calculate_metrics(self, y_test, y_pred, selected_metrics):
+    def calculate_metrics(self, y_test, y_pred):
         try:
             true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)   # Calculate the confusion matrix
             true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
             false_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 4)
             false_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 2)
 
+            metrics = {}
+
             total = true_positive + true_negative + false_positive + false_negative
-            accuracy = (true_positive + true_negative) / total if total > 0 else 0
-            error_rate = (false_positive + false_negative) / total if total > 0 else 0
-            sensitivity = true_positive / (true_positive + false_negative) \
-                if (true_positive + false_negative) > 0 else 0
-            specificity = true_negative / (true_negative + false_positive) \
-                if (true_negative + false_positive) > 0 else 0
-            geometric_mean = sqrt(sensitivity * specificity)
-            auc = (sensitivity + specificity) / 2
 
-            all_metrics = {                                                                      # Store all computed metrics in a dictionary
-                "Accuracy Rate": accuracy,
-                "Error Rate": error_rate,
-                "Sensitivity": sensitivity,
-                "Specificity": specificity,
-                "Geometric Mean": geometric_mean,
-                "Area Under the Curve": auc,
-            }
+            if self.__metrics.__contains__("1") or self.__metrics.__contains__("7"):
+                accuracy = (true_positive + true_negative) / total if total > 0 else 0
+                metrics['Accuracy'] = accuracy
 
-            if selected_metrics:                                                                 # If specific metrics are requested, filter and return them
-                result_metrics = {}                                                              # Initialize empty dictionary
-                for metric in selected_metrics:
-                    if metric in all_metrics:
-                        result_metrics[metric] = all_metrics[metric]                             # Add selected metrics
-                return result_metrics                                                            # Return selected metrics                                                               # Return all metrics if none specified
+            if self.__metrics.__contains__("2") or self.__metrics.__contains__("7"):
+                error_rate = (false_positive + false_negative) / total if total > 0 else 0
+                metrics['Error Rate'] = error_rate
+            if self.__metrics.__contains__("3") or self.__metrics.__contains__("7"):
+                sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
+                metrics['Sensitivity'] = sensitivity
+            if self.__metrics.__contains__("4") or self.__metrics.__contains__("7"):
+                specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
+                metrics['Specificity'] = specificity
+            if self.__metrics.__contains__("5") or self.__metrics.__contains__("7"):
+                sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
+                specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
+                geometric_mean = sqrt(sensitivity * specificity)
+                metrics['Geometric Mean'] = geometric_mean
+            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):
+                sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
+                specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
+                auc = (sensitivity + specificity) / 2
+                metrics['Area Under The Curve Rate'] = auc
+
+            return metrics
+
         except Exception as e:                                                                   # handles exception
             print(e)                                                                             # prints the exception
             sys.exit('Error to split data.')
@@ -178,6 +144,20 @@ class Evaluator:
         import csv
         with open('result.csv', 'w') as fp:
             csv.writer(fp).writerows(metrics.items())
+
+    def save_metrics_from_metrics_list(self, metrics_list: list[dict]):
+        metric_sum = {}
+        metric_count = {}
+
+        for metrics in metrics_list:
+            for key, value in metrics.items():
+                metric_sum[key] = metric_sum.get(key, 0) + value
+                metric_count[key] = metric_count.get(key, 0) + 1
+
+        metrics_mean_list = {key: metric_sum[key] / metric_count[key] for key in metric_count}
+        import csv
+        with open('result.csv', 'w') as fp:
+            csv.writer(fp).writerows(metrics_mean_list.items())
 
     """
     Splits the data into training and test sets based on the training percentage.

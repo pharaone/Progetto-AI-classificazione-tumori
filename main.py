@@ -3,7 +3,7 @@ from Preprocessing.impl.PreprocessorImplementation import PreprocessorImplementa
 
 
 def main():
-    data_path = 'data/version_1.csv'
+    data_path = 'input/version_1.csv'
 
     preprocessor = PreprocessorImplementation()
     targets, features = preprocessor.preprocess(data_path)
