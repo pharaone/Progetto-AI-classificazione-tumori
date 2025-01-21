@@ -11,15 +11,22 @@ from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 class Evaluator:
     __features : pd.DataFrame = None
     __targets : pd.Series = None
-    __metrics: list = None
+    __metrics_map = {
+        "1": "Accuracy Rate",
+        "2": "Error Rate",
+        "3": "Sensitivity",
+        "4": "Specificity",
+        "5": "Geometric Mean",
+        "6": "Area Under the Curve"
+    }
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list = None):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list):
         self.__features = features
         self.__targets = targets
-        self.__metrics = metrics if metrics is not None else [
-            "Accuracy Rate", "Error Rate", "Sensitivity", "Specificity",
-            "Geometric Mean", "Area Under the Curve"
-        ]
+        if metrics is 7:
+            self.__metrics = list(self.__metrics_map.values())
+        else:
+            self.__metrics = [self.__metrics_map[m] for m in metrics if m in self.__metrics_map]
 
     """
     Divides the dataset into training and test sets using the given percentage. 
@@ -131,7 +138,7 @@ class Evaluator:
     Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean, 
     and Area Under the Curve (AUC), it's possible choose the matrics or all the matrics.
     """
-    def calculate_metrics(self, y_test, y_pred, selected_metrics=None):
+    def calculate_metrics(self, y_test, y_pred, selected_metrics):
         try:
             true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)   # Calculate the confusion matrix
             true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
@@ -162,8 +169,7 @@ class Evaluator:
                 for metric in selected_metrics:
                     if metric in all_metrics:
                         result_metrics[metric] = all_metrics[metric]                             # Add selected metrics
-                return result_metrics                                                            # Return selected metrics
-            return all_metrics                                                                   # Return all metrics if none specified
+                return result_metrics                                                            # Return selected metrics                                                               # Return all metrics if none specified
         except Exception as e:                                                                   # handles exception
             print(e)                                                                             # prints the exception
             sys.exit('Error to split data.')
