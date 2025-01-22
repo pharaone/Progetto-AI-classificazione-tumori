@@ -3,7 +3,6 @@ from math import sqrt
 
 import pandas as pd
 import numpy as np
-from pandas.core.interchange.dataframe_protocol import DataFrame
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
@@ -23,7 +22,7 @@ class Evaluator:
     }
     """
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[int]):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str]):
         self.__features = features
         self.__targets = targets
         self.__metrics = metrics
@@ -99,7 +98,7 @@ class Evaluator:
     Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean, 
     and Area Under the Curve (AUC), it's possible choose the matrics or all the matrics.
     """
-    def calculate_metrics(self, y_test, y_pred):
+    def calculate_metrics(self, y_test: pd.Series, y_pred: pd.Series):
         try:
             true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)   # Calculate the confusion matrix
             true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
@@ -142,7 +141,7 @@ class Evaluator:
 
     def save_metrics(self, metrics: dict):
         import csv
-        with open('result.csv', 'w') as fp:
+        with open('output/result.csv', 'w') as fp:
             csv.writer(fp).writerows(metrics.items())
 
     def save_metrics_from_metrics_list(self, metrics_list: list[dict]):
@@ -156,7 +155,7 @@ class Evaluator:
 
         metrics_mean_list = {key: metric_sum[key] / metric_count[key] for key in metric_count}
         import csv
-        with open('result.csv', 'w') as fp:
+        with open('output/result.csv', 'w') as fp:
             csv.writer(fp).writerows(metrics_mean_list.items())
 
     """
