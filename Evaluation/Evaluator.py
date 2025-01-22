@@ -156,24 +156,34 @@ class Evaluator:
             print(e)                                                                             # prints the exception
             sys.exit('Error to split data.')
 
+    """
+    This method saves the evaluation metrics to a CSV file. 
+    The metrics are provided as a dictionary, where keys represent metric names 
+    and values represent their corresponding calculated values as described in the calculate_metrics method.
+    """
     def save_metrics(self, metrics: dict):
         import csv
-        with open('output/result.csv', 'w') as fp:
-            csv.writer(fp).writerows(metrics.items())
+        with open('output/result.csv', 'w') as fp:                                  # open the file in write mode
+            csv.writer(fp).writerows(metrics.items())                               # write the dictionary items as rows in the CSV file
 
+    """
+    This method saves averaged evaluation metrics to a CSV file. 
+    It takes as an input is a list of metric dictionaries (one for each fold or evaluation run) and
+    then it calculates the mean of each metric across all runs and writes the resulting averages to a CSV file.
+    """
     def save_metrics_from_metrics_list(self, metrics_list: list[dict]):
-        metric_sum = {}
-        metric_count = {}
+        metric_sum = {}                                                             # dictionary to store the cumulative sum of each metric
+        metric_count = {}                                                           # dictionary to store the count of values for each metric
 
-        for metrics in metrics_list:
-            for key, value in metrics.items():
-                metric_sum[key] = metric_sum.get(key, 0) + value
-                metric_count[key] = metric_count.get(key, 0) + 1
+        for metrics in metrics_list:                                                # iterate over the list of metrics
+            for key, value in metrics.items():                                      # iterate over each metric dictionary
+                metric_sum[key] = metric_sum.get(key, 0) + value                    # update the cumulative sum for each metric
+                metric_count[key] = metric_count.get(key, 0) + 1                    # update the count for each metric
 
-        metrics_mean_list = {key: metric_sum[key] / metric_count[key] for key in metric_count}
+        metrics_mean_list = {key: metric_sum[key] / metric_count[key] for key in metric_count}              # calculate the mean for each metric
         import csv
-        with open('output/result.csv', 'w') as fp:
-            csv.writer(fp).writerows(metrics_mean_list.items())
+        with open('output/result.csv', 'w') as fp:                                  # open the file in write mode
+            csv.writer(fp).writerows(metrics_mean_list.items())                     # write the dictionary items as rows in the CSV file
 
     """
     Splits the data into training and test sets based on the training percentage.

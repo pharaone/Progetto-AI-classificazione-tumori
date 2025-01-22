@@ -34,8 +34,8 @@ class TestPreprocessorImplementation(unittest.TestCase):
         self.sample_df = pd.DataFrame(self.sample_data)                                     # converts sample data to a dataframe
 
     """
-        This method tests if the load_dataset method is working as expected,
-        by checking no exceptions are raised when loading the sample dataset
+    This method tests if the load_dataset method is working as expected,
+    by checking no exceptions are raised when loading the sample dataset
     """
     def test_load_dataset(self):
         mock_path = 'mock.csv'
@@ -75,8 +75,8 @@ class TestPreprocessorImplementation(unittest.TestCase):
         self.assertTrue(standardized_df['classtype_v1'].equals(cleaned_df['classtype_v1']) )    # checks if the target column is still in the data frame unchanged
 
     """
-        This method tests if the get_targets_and_features method is working as expected,
-        by checking if values returned are a series (target) and a dataframe (features)
+    This method tests if the get_targets_and_features method is working as expected,
+    by checking if values returned are a series (target) and a dataframe (features)
     """
     def test_get_targets_and_features(self):
         cleaned_df = self.preprocessor.data_cleanup(self.sample_df)                             # only clean up data, no need to standardize it for this test
