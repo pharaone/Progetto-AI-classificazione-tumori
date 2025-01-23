@@ -36,7 +36,8 @@ class KnnAlgorithm:
                 distance = distance_strategy.calculate(x,
                                                        x_train_sample)  # Calculate distance between the test point `x` and the current training sample `x_train_sample`
                 distances.append(distance)
-
+            if self.k <= 0:
+                raise ValueError("k should be a positive integer.")
             k_indices = np.argsort(distances)[:self.k]                  # Sort distances and get the indices of the k smallest
         except Exception as e:                                          # handles  exception
             print(e)                                                    # prints the exception
