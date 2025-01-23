@@ -48,7 +48,7 @@ class Evaluator:
             y_pred = knn.predict(x_test)                                # Make predictions on the test data
         except Exception as e:                                          # handles every other exception
             print(e)                                                    # prints the exception
-            sys.exit('Error to use holdout_validation.')
+            sys.exit('Error to use holdout validation.')
 
         self.save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
         self.plot_save_confusion_matrix(self.calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
@@ -125,39 +125,41 @@ class Evaluator:
 
     """
     Calculates the main evaluation metrics for the KNN model: 
-    Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean, 
-    and Area Under the Curve (AUC), it's possible choose the matrics or all the matrics.
+    Accuracy, Error Rate, Sensitivity, Specificity, Geometric Mean,and Area Under the Curve (AUC).
+    The calculation is based on the specific metrics selected by the user, 
+    identified through numerical keys provided in the class.
+    Depending on the selected numbers, the corresponding metrics are computed.
     """
     def calculate_metrics(self, y_test: pd.Series, y_pred: pd.Series):
         try:
-            true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)   # Calculate the confusion matrix
+            true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)                                   # Calculate the confusion matrix
             true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
             false_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 4)
             false_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 2)
 
-            metrics = {}
+            metrics = {}                                                                                                        # Dictionary to store computed metrics
 
             total = true_positive + true_negative + false_positive + false_negative
 
-            if self.__metrics.__contains__("1") or self.__metrics.__contains__("7"):
+            if self.__metrics.__contains__("1") or self.__metrics.__contains__("7"):                                            # Calculate accuracy if selected
                 accuracy = (true_positive + true_negative) / total if total > 0 else 0
                 metrics['Accuracy'] = accuracy
 
-            if self.__metrics.__contains__("2") or self.__metrics.__contains__("7"):
+            if self.__metrics.__contains__("2") or self.__metrics.__contains__("7"):                                            # Calculate error rate if selected
                 error_rate = (false_positive + false_negative) / total if total > 0 else 0
                 metrics['Error Rate'] = error_rate
-            if self.__metrics.__contains__("3") or self.__metrics.__contains__("7"):
+            if self.__metrics.__contains__("3") or self.__metrics.__contains__("7"):                                            # Calculate sensitivity if selected
                 sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
                 metrics['Sensitivity'] = sensitivity
-            if self.__metrics.__contains__("4") or self.__metrics.__contains__("7"):
+            if self.__metrics.__contains__("4") or self.__metrics.__contains__("7"):                                            # Calculate specificity if selected
                 specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
                 metrics['Specificity'] = specificity
-            if self.__metrics.__contains__("5") or self.__metrics.__contains__("7"):
+            if self.__metrics.__contains__("5") or self.__metrics.__contains__("7"):                                            # Calculate geometric mean if selected
                 sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
                 specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
                 geometric_mean = sqrt(sensitivity * specificity)
                 metrics['Geometric Mean'] = geometric_mean
-            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):
+            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):                                            # Calculate AUC if selected
                 sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
                 specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
                 auc = (sensitivity + specificity) / 2
@@ -167,7 +169,7 @@ class Evaluator:
 
         except Exception as e:                                                                   # handles exception
             print(e)                                                                             # prints the exception
-            sys.exit('Error to split data.')
+            sys.exit('Error to calculate metrics.')
 
     """
     This method calculates the confusion matrix from the data of the predictions and the real target data.
