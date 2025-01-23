@@ -1,8 +1,11 @@
 import sys
 from math import sqrt
+from typing import Any
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from numpy import ndarray, dtype
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
@@ -47,7 +50,8 @@ class Evaluator:
             print(e)                                                    # prints the exception
             sys.exit('Error to use holdout_validation.')
 
-        self.save_metrics(self.calculate_metrics(y_test, y_pred))       # Calculate and return the evaluation metrics
+        self.save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
+        self.plot_save_confusion_matrix(self.calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
 
     """
     This method divides the data into k (user inserted parameter) subsets for k-fold cross-validation.
@@ -61,6 +65,9 @@ class Evaluator:
 
         metrics = []                                                            # created an empty metrics array
 
+        classes = [4, 2]
+        confusion_matrix = np.zeros((len(classes), len(classes)), dtype=int)       # create the confusion matrix
+
         for index in range(k_times):
             # create a feature and a target set without the current index fold
             features_set = features_subsets.copy().pop(index)
@@ -70,7 +77,9 @@ class Evaluator:
             y_prediction = knn.predict(features_subsets[index])                 # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))   # calculates the requested metrics for this evaluation and appends them to the list
+            confusion_matrix += self.calculate_confusion_matrix(targets_set, y_prediction)      # add the data from the current run to the confusion matrix
 
+        self.plot_save_confusion_matrix(confusion_matrix, "output/mean_confusion_matrix.jpg")      # plot and save the confusion matrix
         self.save_metrics_from_metrics_list(metrics)                            # saves to file the requested metrics
 
     """
@@ -98,6 +107,9 @@ class Evaluator:
 
         metrics = []                                                                    # created an empty metrics array
 
+        classes = [4, 2]
+        confusion_matrix = np.zeros((len(classes), len(classes)), dtype=int)     # create the confusion matrix
+
         for index in range(k_times):
             features_set = pd.concat([benign_subsets.copy().pop(index), malign_subsets.copy().pop(index)])          # unites benign and maling sets and removes the current index fold
             targets_set = pd.concat([benign_targets.copy().pop(index), malign_targets.copy().pop(index)])           # unites benign and maling sets and removes the current index fold
@@ -106,8 +118,9 @@ class Evaluator:
             y_prediction = knn.predict(pd.concat([benign_subsets[index], malign_subsets[index]]))       # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))           # calculates the requested metrics for this evaluation and appends them to the list
+            confusion_matrix += self.calculate_confusion_matrix(targets_set, y_prediction)              # add the data from the current run to the confusion matrix
 
-
+        self.plot_save_confusion_matrix(confusion_matrix, "output/mean_confusion_matrix.jpg")   # plots and saves the confusion matrix
         self.save_metrics_from_metrics_list(metrics)                                    # saves to file the requested metrics
 
     """
@@ -155,6 +168,56 @@ class Evaluator:
         except Exception as e:                                                                   # handles exception
             print(e)                                                                             # prints the exception
             sys.exit('Error to split data.')
+
+    """
+    This method calculates the confusion matrix from the data of the predictions and the real target data.
+    """
+    def calculate_confusion_matrix(self, y_test: pd.Series, y_pred: pd.Series) -> ndarray[tuple[int, int], dtype[Any]]:
+        classes = [4, 2]                                                # define class labels (4 for malign and 2 for benign)
+
+        confusion_matrix = np.zeros((len(classes), len(classes)), dtype=int)        # initialize confusion matrix
+
+        for true, pred in zip(y_test, y_pred):                                             # iterate for each target value (a row contains the real value and the prediction)
+            true_index = classes.index(true)
+            pred_index = classes.index(pred)
+            confusion_matrix[true_index, pred_index] += 1                                  # depending on the value of the prediction and the real data add 1 to the correct cell of the matrix
+
+        return confusion_matrix                                                            # return the matrix
+
+    """
+    This method takes a confusion matrix as input, plots it in a new figure and saves it as a png file.
+    """
+    def plot_save_confusion_matrix(self, confusion_matrix: ndarray[tuple[int, int], dtype[Any]], output_path: str):
+
+        classes = [4, 2]  # Define class labels (4 for malign and 2 for benign)
+        class_labels = ['Malign (4)', 'Benign (2)']
+
+        try:
+            fig, ax = plt.subplots(figsize=(8, 6))                                          # creates a new figure and an axis
+            im = ax.imshow(confusion_matrix, interpolation='nearest', cmap='Blues')         # display the confusion matrix as a heatmap on the axis
+            plt.colorbar(im, ax=ax)                                                         # adds a colorbar to the plot, linked to the heatmap image
+
+            for i in range(len(classes)):                                                           # iterate over classes to write in each cell of the matrix
+                for j in range(len(classes)):
+                    ax.text(j, i, confusion_matrix[i, j], ha="center", va="center", color="black")  # writes the value to the correct cell of the axys
+
+            # Set axis labels and ticks
+            ax.set(xticks=np.arange(len(classes)),
+                   yticks=np.arange(len(classes)),
+                   xticklabels=class_labels,
+                   yticklabels=class_labels,
+                   xlabel='Predicted Label',            # set x axis label
+                   ylabel='True Label',                 # set y axis label
+                   title='Confusion Matrix')            # set matrix tile
+
+            plt.xticks(rotation=45)                     # rotate x-axis labels for better readability
+
+            plt.tight_layout()                          # this auto adjusts spacing
+            plt.savefig(output_path)                    # save the file
+            plt.close()
+            print(f"Confusion matrix successfully saved to {output_path}")
+        except Exception as e:
+            print(f"Error while plotting confusion matrix: {e}")
 
     """
     This method saves the evaluation metrics to a CSV file. 
