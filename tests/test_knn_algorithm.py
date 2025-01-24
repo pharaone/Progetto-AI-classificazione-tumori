@@ -46,6 +46,7 @@ class TestKnnAlgorithm(unittest.TestCase):
 
         self.assertIn(neighbors.iloc[0], self.y_train.values)                        # Check that the first neighbor belongs to the original y_train labels
         self.assertIn(neighbors.iloc[1], self.y_train.values)                        # Check that the second neighbor belongs to the original y_train labels
+
     """
     This method checks that the predict function works as expected. It ensures 
     that the model returns predictions for a set of test points, verifies that the output 
