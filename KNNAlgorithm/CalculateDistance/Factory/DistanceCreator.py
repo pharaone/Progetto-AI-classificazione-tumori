@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from KNNAlgorithm.CalculateDistance.DistanceStrategy import DistanceStrategy
+from KNNAlgorithm.CalculateDistance.Strategy.DistanceStrategy import DistanceStrategy
 """
 This is an abstract class designed to create distance calculation strategies.
 It uses the Factory Method design pattern to ensure flexibility and scalability.    

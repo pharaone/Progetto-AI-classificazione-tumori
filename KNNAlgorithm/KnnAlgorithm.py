@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 
 from KNNAlgorithm.CalculateDistance.Factory.EuclideanDistanceCreator import EuclideanDistanceCreator
+from KNNAlgorithm.CalculateDistance.Factory.SquaredEuclideanDistanceCreator import SquaredEuclideanDistanceCreator
 
 
 class KnnAlgorithm:
@@ -28,7 +29,7 @@ class KnnAlgorithm:
 
     def get_neighbors(self, x: pd.Series):
         try:
-            distance_creator = EuclideanDistanceCreator()               # Create an instance of the factory for calculating Euclidean distance.
+            distance_creator = SquaredEuclideanDistanceCreator()        # Create an instance of the factory for calculating Euclidean distance.
             distance_strategy = distance_creator.create_distance()      # Create the distance calculation strategy (EuclideanDistance).
             distances = []
 
