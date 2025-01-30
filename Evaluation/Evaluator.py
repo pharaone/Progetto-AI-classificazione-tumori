@@ -39,12 +39,12 @@ class Evaluator:
     Trains the KNN model on the training set and evaluates its predictions on the test set.
     At the end calculate metrics that are crucial to understanding the model's overall performance
     """
-    def holdout_validation(self, training_percentage: float, k_neighbors: int):
+    def holdout_validation(self, training_percentage: float, k_neighbors: int, distance_strategy: int):
         try:
             x_train, y_train, x_test, y_test = self.split_data(
                 training_percentage)                                    # Split the data into training and test sets
 
-            knn = KnnAlgorithm(k_neighbors, x_train, y_train)           # Initialize the KNN classifier
+            knn = KnnAlgorithm(k_neighbors, x_train, y_train, distance_strategy)           # Initialize the KNN classifier
             y_pred = knn.predict(x_test)                                # Make predictions on the test data
         except Exception as e:                                          # handles every other exception
             print(e)                                                    # prints the exception
@@ -58,7 +58,7 @@ class Evaluator:
     It trains the KNN model on k-1 subsets and evaluates on the remaining one for k times
     calculating metrics each time and averaging them across all folds.
     """
-    def k_fold_cross_validation(self, k_times: int, k_neighbors: int):
+    def k_fold_cross_validation(self, k_times: int, k_neighbors: int, distance_strategy: int):
         # divide the features and targets into k subsets
         features_subsets : [pd.DataFrame] = np.array_split(self.__features, k_times)
         targets_subsets : [pd.Series] = np.array_split(self.__targets, k_times)
@@ -73,7 +73,7 @@ class Evaluator:
             features_set = features_subsets.copy().pop(index)
             targets_set = targets_subsets.copy().pop(index)
 
-            knn = KnnAlgorithm(k_neighbors, features_set, targets_set)          # creates an instance of the knn model
+            knn = KnnAlgorithm(k_neighbors, features_set, targets_set, distance_strategy)          # creates an instance of the knn model
             y_prediction = knn.predict(features_subsets[index])                 # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))   # calculates the requested metrics for this evaluation and appends them to the list
@@ -87,7 +87,7 @@ class Evaluator:
     It trains the KNN model on k-1 folds each with the same class distribution as the original set 
     and evaluates on the remaining one calculating metrics each time and averaging them across all folds.
     """
-    def stratified_cross_validation(self, k_times: int, k_neighbors: int):
+    def stratified_cross_validation(self, k_times: int, k_neighbors: int, distance_strategy: int):
         unified_features_and_targets = self.__features.copy()                           # creates a copy of the features
         unified_features_and_targets['targets'] = self.__targets.copy()                 # adds the target column to the copy
         unified_features_and_targets.sort_values(by=['targets'], inplace=True)          # sorts everything by class
@@ -114,7 +114,7 @@ class Evaluator:
             features_set = pd.concat([benign_subsets.copy().pop(index), malign_subsets.copy().pop(index)])          # unites benign and maling sets and removes the current index fold
             targets_set = pd.concat([benign_targets.copy().pop(index), malign_targets.copy().pop(index)])           # unites benign and maling sets and removes the current index fold
 
-            knn = KnnAlgorithm(k_neighbors, features_set, targets_set)                                  # creates an instance of the knn model
+            knn = KnnAlgorithm(k_neighbors, features_set, targets_set, distance_strategy)                                  # creates an instance of the knn model
             y_prediction = knn.predict(pd.concat([benign_subsets[index], malign_subsets[index]]))       # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))           # calculates the requested metrics for this evaluation and appends them to the list

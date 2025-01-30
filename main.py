@@ -1,4 +1,5 @@
 from Evaluation.Evaluator import Evaluator
+from KNNAlgorithm.CalculateDistance.Factory.DistanceCreator import DistanceCreator
 from Preprocessing.impl.PreprocessorImplementation import PreprocessorImplementation
 
 
@@ -38,18 +39,21 @@ def main():
 
         evaluator = Evaluator(features, targets, metriche_selezionate)
 
+        print("\nSeleziona la strategia di distanza:")
+        print("1 - Squared Euclidean Distance")
+        distanza_scelta = int(input("Inserisci il numero della strategia desiderata: "))
+
         if scelta == "1":
             training_percentage = float(input("Inserisci la percentuale di training (es. 0.8 per 80%): "))
-            risultati = evaluator.holdout_validation(training_percentage, k_neighbors)
-            print("Risultati Holdout Validation:", risultati)
+            evaluator.holdout_validation(training_percentage, k_neighbors, distanza_scelta)
 
         elif scelta == "2":
             k_folds = int(input("Inserisci il numero di fold (es. 5): "))
-            evaluator.k_fold_cross_validation(k_folds, k_neighbors)
+            evaluator.k_fold_cross_validation(k_folds, k_neighbors, distanza_scelta)
 
         elif scelta == "3":
             k_folds = int(input("Inserisci il numero di fold per la validazione stratificata (es. 5): "))
-            evaluator.stratified_cross_validation(k_folds, k_neighbors)
+            evaluator.stratified_cross_validation(k_folds, k_neighbors, distanza_scelta)
 
         else:
             print("Scelta non valida. Riprova.")
