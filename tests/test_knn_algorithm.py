@@ -18,8 +18,9 @@ class TestKnnAlgorithm(unittest.TestCase):
             'feature1': [1, 2, 3, 4],
             'feature2': [5, 6, 7, 8]
         })
+        self.distance_strategy = 1                                                  # Creating a distance_strategy to use to calculate distance
         self.y_train = pd.Series(['A', 'B', 'A', 'B'])                              # Creating labels corresponding to the training data
-        self.knn = KnnAlgorithm(k=2, x_train=self.x_train, y_train=self.y_train)    # Initializing an instance of the KnnAlgorithm class with k=2
+        self.knn = KnnAlgorithm(k=2, x_train=self.x_train, y_train=self.y_train, distance_strategy=self.distance_strategy)    # Initializing an instance of the KnnAlgorithm class with k=2
 
     """
     This method verifies that the KnnAlgorithm object is correctly 
@@ -31,6 +32,7 @@ class TestKnnAlgorithm(unittest.TestCase):
         self.assertEqual(self.knn.k, 2)                                      # Verify that the value of k is set correctly to 2
         self.assertTrue(isinstance(self.knn.x_train, pd.DataFrame))                 # Check that the x_train attribute is a pandas DataFrame
         self.assertTrue(isinstance(self.knn.y_train, pd.Series))                    # Check that the y_train attribute is a pandas Series
+        self.assertEqual(self.knn.distance_strategy, self.distance_strategy)        #Check if the distance_strategy is equal to the knn distance strategy
 
     """
     This method tests the get_neighbors function, which is responsible 
@@ -40,7 +42,7 @@ class TestKnnAlgorithm(unittest.TestCase):
     """
     def test_get_neighbors(self):
         test_point = pd.Series({'feature1': 2.5, 'feature2': 6.5})                  # Define a test point with two features ('feature1' and 'feature2')
-        neighbors = self.knn.get_neighbors(test_point)                              # Call the get_neighbors function to obtain the k nearest neighbors to the test point
+        neighbors = self.knn.get_neighbors(test_point, self.distance_strategy)      # Call the get_neighbors function to obtain the k nearest neighbors to the test point
 
         self.assertEqual(len(neighbors), 2)                                  # Verify that the number of neighbors returned is equal to 2 (value of k)
 
@@ -72,8 +74,8 @@ class TestKnnAlgorithm(unittest.TestCase):
     The expected behavior is that the function should raise a SystemExit error.
     """
     def test_invalid_k_value(self):
-        knn = KnnAlgorithm(k=-1, x_train=self.x_train, y_train=self.y_train)            # Creating an instance of KnnAlgorithm with an invalid k value (-1)
-        self.assertRaises(SystemExit, knn.get_neighbors, pd.Series([1, 2]))             # Verify that calling get_neighbors with a test point raises a SystemExit
+        knn = KnnAlgorithm(k=-1, x_train=self.x_train, y_train=self.y_train, distance_strategy=self.distance_strategy)            # Creating an instance of KnnAlgorithm with an invalid k value (-1)
+        self.assertRaises(SystemExit, knn.get_neighbors, pd.Series([1, 2]), self.distance_strategy)             # Verify that calling get_neighbors with a test point raises a SystemExit
 
 if __name__ == '__main__':
     unittest.main()

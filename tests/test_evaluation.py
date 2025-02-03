@@ -15,6 +15,7 @@ class TestEvaluator(unittest.TestCase):
         })
         self.targets = pd.Series([2, 4, 2, 4, 2, 4])                            # Series of associated targets
         self.metrics = ["1", "2", "3", "4", "5", "6"]                           # Selection of all metrics
+        self.distance_strategy = 1                                              # Distance strategy to use for knn that chose the distance strategy
 
         self.evaluator = Evaluator(self.features, self.targets, self.metrics)   # Create an Evaluator instance
 
@@ -38,7 +39,7 @@ class TestEvaluator(unittest.TestCase):
         self.assertGreater(len(x_train), 0)                                              # Ensure that training and test data are not empty
         self.assertGreater(len(x_test), 0)
 
-        knn = KnnAlgorithm(k_neighbors, x_train, y_train)                                   # Train and predict using KNN
+        knn = KnnAlgorithm(k_neighbors, x_train, y_train, self.distance_strategy)           # Train and predict using KNN
         y_pred = knn.predict(x_test)
         self.assertEqual(len(y_pred), len(y_test))                                          # Check prediction length
 
