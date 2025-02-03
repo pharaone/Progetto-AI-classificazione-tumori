@@ -1,13 +1,13 @@
 # Progetto-AI-classificazione-tumori
 
 ## Indice
-1. [Introduzione](#1-introduzione)
-2. [Esecuzione del progetto](#2-esecuzione-del-progetto)
+1. [Introduzione](#1-Introduzione)
+2. [Esecuzione del progetto](#2-Esecuzione-del-progetto)
 3. [Preprocessing del Dataset](#3-preprocessing-del-dataset)
-4. [K-nearest neighbors Algorithm (KNN)](#4-k-nearest-neighbors-Algorithm-(KNN))
-5. [Validazione del modello e metriche calcolate](#5-validazione-del modello-e-metriche-calcolate)
-6. [Risultati](#6-Risultati)
-7. [Coclusione](#7-Conclusione)
+4. [K-nearest neighbors Algorithm (KNN)](#4-k-nearest-neighbors-algorithm-knn)
+5. [Validazione del modello e metriche calcolate](#5-validazione-del-modello-e-metriche-calcolate)
+6. [Risultati](#6-risultati)
+7. [Conclusione](#7-conclusione)
 
 ### 1. Introduzione
 Il progetto è stato sviluppato da Emanuele Antonio Faraone (@pharaone) e Stefano Imbalzano per il corso di Fondamenti di Intelligenza Artificiale (2024-2025).
@@ -44,7 +44,7 @@ Tuttavia, grazie alla struttura del Factory, è possibile aggiungere facilmente 
 Il parametro "k" rappresenta il numero di vicini da prendere in considerazione per il processo di classificazione. Se si imposta k=1, l'oggetto da classificare viene associato alla categoria del punto più vicino. La scelta ottimale di "k" è cruciale per bilanciare correttamente l'accuratezza del modello e la sua capacità di generalizzazione. 
 L'implementazione include inoltre il controllo degli errori per garantire che i parametri utilizzati (ad esempio, il numero di vicini k e la strategia di distanza) siano validi. In caso di errore, il programma gestisce le eccezioni e termina con un messaggio appropriato.
 
-### 5. Validazione del modello e metriche utilizzate
+### 5. Validazione del modello e metriche calcolate
 Per valutare le prestazioni del classificatore, il programma implementa tre tecniche di validazione:
 - __Holdout Validation__: L'Holdout Validation è una tecnica di validazione utilizzata per valutare le prestazioni di un modello di machine learning. In questa metodologia, il dataset viene suddiviso in due insiemi separati: un insieme di addestramento e un insieme di test. La percentuale di dati destinata all'addestramento e al test è determinata dall'utente, con una tipica divisione di 70-30 o 80-20.
 
