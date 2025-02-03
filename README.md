@@ -5,7 +5,7 @@
 2. [Esecuzione del progetto](#2-esecuzione-del-progetto)
 3. [Preprocessing del Dataset](#3-preprocessing-del-dataset)
 4. [K-nearest neighbors Algorithm (KNN)](#4-k-nearest-neighbors-Algorithm-(KNN))
-5. [Validazione del modello e metriche calcolate](#5-validazione del modello e metriche calcolate)
+5. [Validazione del modello e metriche calcolate](#5-validazione-del modello-e-metriche-calcolate)
 6. [Risultati](#6-Risultati)
 7. [Coclusione](#7-Conclusione)
 
