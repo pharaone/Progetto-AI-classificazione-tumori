@@ -1,9 +1,9 @@
-from Evaluation.Evaluator import Evaluator
-from KNNAlgorithm.CalculateDistance.Factory.DistanceCreator import DistanceCreator
 from Preprocessing.impl.PreprocessorImplementation import PreprocessorImplementation
+import Evaluation.factory.EvaluationFactory as EvaluationFactory
 
 
 def main():
+    global evaluator
     data_path = 'input/version_1.csv'
 
     preprocessor = PreprocessorImplementation()
@@ -37,26 +37,29 @@ def main():
         metriche_input = input("Inserisci i numeri delle metriche (separati da virgola): ")
         metriche_selezionate = metriche_input.split(",")
 
-        evaluator = Evaluator(features, targets, metriche_selezionate)
-
         print("\nSeleziona la strategia di distanza:")
         print("1 - Squared Euclidean Distance")
         distanza_scelta = int(input("Inserisci il numero della strategia desiderata: "))
 
+
         if scelta == "1":
             training_percentage = float(input("Inserisci la percentuale di training (es. 0.8 per 80%): "))
-            evaluator.holdout_validation(training_percentage, k_neighbors, distanza_scelta)
+            evaluator = EvaluationFactory.get_holdout_evaluator(features, targets, metriche_selezionate, k_neighbors
+                                                                        , distanza_scelta, training_percentage)
 
         elif scelta == "2":
             k_folds = int(input("Inserisci il numero di fold (es. 5): "))
-            evaluator.k_fold_cross_validation(k_folds, k_neighbors, distanza_scelta)
+            evaluator = EvaluationFactory.get_K_fold_evaluator(features, targets, metriche_selezionate, k_neighbors,
+                                                                       distanza_scelta, k_folds)
 
         elif scelta == "3":
             k_folds = int(input("Inserisci il numero di fold per la validazione stratificata (es. 5): "))
-            evaluator.stratified_cross_validation(k_folds, k_neighbors, distanza_scelta)
-
+            evaluator = EvaluationFactory.get_stratified_evaluator(features, targets, metriche_selezionate,
+                                                                              k_neighbors, distanza_scelta, k_folds)
         else:
             print("Scelta non valida. Riprova.")
+
+        evaluator.evaluate()
 
 
 if __name__ == "__main__":

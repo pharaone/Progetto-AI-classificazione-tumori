@@ -2,6 +2,7 @@ import unittest
 import pandas as pd
 
 from Evaluation.Evaluator import Evaluator
+from Evaluation.evaluators.HoldoutEvaluator import HoldoutEvaluator
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
 
@@ -17,7 +18,6 @@ class TestEvaluator(unittest.TestCase):
         self.metrics = ["1", "2", "3", "4", "5", "6"]                           # Selection of all metrics
         self.distance_strategy = 1                                              # Distance strategy to use for knn that chose the distance strategy
 
-        self.evaluator = Evaluator(self.features, self.targets, self.metrics)   # Create an Evaluator instance
 
     """
     Test the functionality of holdout validation, including:
@@ -26,8 +26,10 @@ class TestEvaluator(unittest.TestCase):
     Training a KNN model and verifying its predictions have the correct length.
     """
     def test_holdout_validation(self):
-        training_percentage = 0.67                                                          # Percentage of the dataset used for training
-        k_neighbors = 3                                                                     # Number of neighbors to consider
+        training_percentage = 0.67  # Percentage of the dataset used for training
+        k_neighbors = 3  # Number of neighbors to consider
+
+        self.evaluator = HoldoutEvaluator(self.features, self.targets, self.metrics, self.distance_strategy, k_neighbors, training_percentage)
 
         x_train, y_train, x_test, y_test = self.evaluator.split_data(training_percentage)   # Split the data into training and test sets
 
@@ -49,6 +51,11 @@ class TestEvaluator(unittest.TestCase):
     Ensuring all necessary metrics are calculated.
     """
     def test_calculate_metrics(self):
+        training_percentage = 0.67  # Percentage of the dataset used for training
+        k_neighbors = 3  # Number of neighbors to consider
+
+        self.evaluator = HoldoutEvaluator(self.features, self.targets, self.metrics, self.distance_strategy,
+                                          k_neighbors, training_percentage)
         y_test = pd.Series([2, 4, 2, 4])                                                    # Actual target values
         y_pred_correct = pd.Series([2, 4, 2, 4])                                            # Completely correct predictions
         y_pred_incorrect = pd.Series([4, 2, 4, 2])                                          # Completely incorrect predictions
