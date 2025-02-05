@@ -163,12 +163,25 @@ class Evaluator:
                 specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
                 geometric_mean = sqrt(sensitivity * specificity)
                 metrics['Geometric Mean'] = geometric_mean
-            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):                                            # Calculate AUC if selected
-                sensitivity = true_positive / (true_positive + false_negative) if (true_positive + false_negative) > 0 else 0
-                specificity = true_negative / (true_negative + false_positive) if (true_negative + false_positive) > 0 else 0
-                auc = (sensitivity + specificity) / 2
-                metrics['Area Under The Curve Rate'] = auc
+            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):
+                fpr, tpr = [], []
+                thresholds = np.linspace(2, 4, 30)  # Intervallo [2, 4]
 
+                for m in thresholds:
+                    tp = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred >= m)
+                    tn = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred < m)
+                    fp = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred >= m)
+                    fn = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred < m)
+                    tpr.append(tp / (tp + fn) if (tp + fn) > 0 else 0)
+                    fpr.append(fp / (fp + tn) if (fp + tn) > 0 else 0)
+
+                sorted_indices = np.argsort(fpr)
+                fpr = np.array(fpr)[sorted_indices]
+                tpr = np.array(tpr)[sorted_indices]
+
+                auc_value = np.trapz(tpr, fpr)
+
+                metrics['Area Under The Curve Rate'] = auc_value
             return metrics
 
         except Exception as e:                                                                   # handles exception
