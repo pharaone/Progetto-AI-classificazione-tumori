@@ -22,15 +22,29 @@ Durante l'esecuzione, l'utente è tenuto a specificare diversi parametri:
 - Metriche di valutazione da calcolare.
 
 ### 3. Preprocessing del dataset
-Il preprocessing dei dati è un passaggio cruciale per garantire la qualità dei dati utilizzati per il training del modello. Le operazioni eseguite sono le seguenti:
+Il preprocessing dei dati è una fase cruciale nel ciclo di vita di un modello di machine learning. Questa fase permette di trasformare i dati grezzi in un formato più pulito, strutturato e adatto all'analisi. Il processo si sviluppa in diverse fasi fondamentali, che vanno dal caricamento del dataset fino alla separazione delle variabili di input (feature) e della variabile target.
+- __Caricamento del Dataset__:
+La prima operazione consiste nel leggere i dati da un file di input. È fondamentale gestire eventuali errori di caricamento, come l'assenza del file o la presenza di formati non compatibili. Questa fase garantisce che il dataset sia disponibile in memoria sotto forma di una tabella strutturata, solitamente rappresentata come un DataFrame.
 
-- Caricamento del dataset: Il file CSV viene caricato e trasformato in un DataFrame di Pandas.
-- Pulizia dei dati:
-    - Rimozione della colonna "Sample Code Number" in quanto non utile ai fini della classificazione.
-    - Conversione di tutti i valori in formato numerico, eliminando eventuali righe contenenti dati non numerici.
-    - Eliminazione di valori mancanti.
-- Standardizzazione: I valori delle feature vengono trasformati per avere media zero e deviazione standard unitaria.
-- Suddivisione in target e feature: Il dataset viene diviso in un vettore delle etichette (target) e una matrice delle feature.
+
+- __Pulizia dei Dati__:
+Una volta caricato il dataset, è necessario effettuare un processo di pulizia. In questa fase si eseguono operazioni come:
+  - __Eliminazione di colonne non necessarie__: Alcune colonne possono essere ridondanti o irrilevanti per l'analisi.
+  - __Conversione dei dati__: I valori devono essere trasformati in un formato numerico per essere elaborati correttamente dal modello. Eventuali errori di conversione possono portare alla rimozione delle righe problematiche.
+  - __Gestione dei valori mancanti__: Le righe contenenti valori nulli o mancanti vengono eliminate per garantire la qualità del dataset.
+
+
+- __Standardizzazione dei Dati__:
+Per garantire che i dati siano comparabili tra loro, è importante applicare una tecnica di standardizzazione. In questa fase, ogni colonna numerica viene trasformata in modo che abbia media pari a zero e deviazione standard pari a uno. Questo processo è particolarmente utile quando le variabili hanno scale diverse e aiuta i modelli a convergere più rapidamente durante l'addestramento. La colonna che rappresenta la variabile target viene esclusa dalla standardizzazione, poiché il suo valore deve rimanere inalterato.
+
+
+- __Separazione di Feature e Target__:
+  L'ultimo passaggio consiste nella suddivisione del dataset in due insiemi distinti:
+  - __Feature__: Contengono le informazioni necessarie per la predizione.
+  - __Target__: Rappresenta la variabile di output che il modello dovrà apprendere a predire.
+  Questa separazione è essenziale per addestrare e valutare un modello di machine learning in modo corretto.
+
+Il preprocessing è una fase determinante, perché permette di ottenere dati coerenti, privi di errori e ben strutturati, migliorando così l'efficacia del modello predittivo.
 
 ### 4. K-nearest neighbors Algorithm (KNN)
 L'__algoritmo dei k-nearest neighbors (KNN)__ è un metodo di classificazione supervisionata che classifica un elemento sulla base della classe più frequente tra i suoi k vicini più prossimi. Il nostro programma implementa un classificatore KNN personalizzato, 
@@ -52,8 +66,11 @@ Per valutare le prestazioni del classificatore, il programma implementa tre tecn
     
     Successivamente, il modello addestrato viene utilizzato per fare previsioni sull'insieme di test, che non è stato visto durante la fase di addestramento, permettendo di valutare le sue capacità di generalizzazione.
     Una volta ottenute le previsioni, si procede con il calcolo di metriche di valutazione fondamentali per comprendere le prestazioni del modello.
-- __K-Fold Cross Validation__: Il dataset viene suddiviso in k sottoinsiemi. Il modello viene addestrato k volte, utilizzando ogni volta k-1 sottoinsiemi per il training e il restante per il test.
-- __Stratified Cross Validation__: Variante della K-Fold in cui ogni fold mantiene la stessa proporzione di classi del dataset originale, migliorando la rappresentatività dei dati di test.
+- __K-Fold Cross Validation__:  E' una tecnica di validazione per valutare la performance di un modello di machine learning. Il dataset viene suddiviso in k sottoinsiemi (folds) di dimensioni simili. 
+Il modello viene addestrato su k-1 di questi sottoinsiemi e testato sull’ultimo rimanente. Questo processo si ripete k volte, cambiando il fold di test ogni volta. Alla fine, le metriche di valutazione vengono mediate su tutte le iterazioni per ottenere una stima più affidabile delle prestazioni. 
+Questo metodo è utile per ridurre il rischio di overfitting rispetto alla semplice suddivisione tra training e test set, poiché il modello viene testato su diverse parti del dataset.
+- __Stratified Cross Validation__: E' una variante del k-fold che mantiene la distribuzione originale delle classi in ogni fold. Questo è particolarmente utile per dataset sbilanciati, in cui alcune classi sono molto più frequenti di altre.
+ La procedura è la stessa del k-fold, ma la suddivisione in fold avviene in modo che la proporzione delle classi sia simile a quella dell’intero dataset.
 
 Le metriche di valutazione disponibili sono:
 - __Accuracy Rate__: L'accuratezza misura la percentuale di previsioni corrette rispetto al totale delle previsioni effettuate.
@@ -74,7 +91,9 @@ Le metriche di valutazione disponibili sono:
 - __All the above__: Opzione per calcolare e visualizzare tutte le metriche sopra elencate in una sola analisi.
 
 ### 6. Risultati
-
+Dopo l'esecuzione della valutazione, il programma produce due output principali. Il primo è un file CSV che contiene i valori delle metriche selezionate, calcolati in base alle predizioni effettuate dal modello. Questo file permette di analizzare le prestazioni del modello in modo dettagliato e quantitativo. 
+Il secondo output è un plot della matrice di confusione, salvato come immagine, che fornisce una rappresentazione visiva degli errori e delle corrette classificazioni effettuate. Questo grafico aiuta a comprendere meglio il comportamento del modello, specialmente in presenza di classi sbilanciate.
 ### 7. Conclusione
-In conclusione, questo progetto offre un ambiente potente e interattivo per la classificazione dei dati medici, con un focus particolare sull'uso dell'algoritmo KNN. La struttura del progetto è progettata per garantire un'ampia flessibilità, permettendo agli utenti di personalizzare e ottimizzare il modello a seconda delle esigenze specifiche del loro dataset. Ogni fase del processo, dal preprocessing dei dati all'addestramento del modello, fino alla validazione, è pensata per offrire una solida base di lavoro che consenta di ottenere risultati accurati e significativi.
+In conclusione, questo progetto offre un ambiente potente e interattivo per la classificazione dei dati medici, con un focus particolare sull'uso dell'algoritmo KNN. La struttura del progetto è progettata per garantire un'ampia flessibilità, permettendo agli utenti di personalizzare e ottimizzare il modello a seconda delle esigenze specifiche del loro dataset. 
+Ogni fase del processo, dal preprocessing dei dati all'addestramento del modello, fino alla validazione, è pensata per offrire una solida base di lavoro che consenta di ottenere risultati accurati e significativi.
 Nel complesso, il progetto fornisce un workflow completo e strutturato, che aiuta non solo a sviluppare modelli di classificazione efficaci, ma anche a comprenderne a fondo il comportamento e le prestazioni. Questo è particolarmente importante in ambito medico, dove la precisione e l'affidabilità delle previsioni possono avere un impatto diretto sulla diagnosi e sul trattamento dei pazienti.
