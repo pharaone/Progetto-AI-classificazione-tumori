@@ -14,7 +14,7 @@ class Evaluator(ABC):
        This method calculates the confusion matrix from the data of the predictions and the real target data.
     """
 
-    def calculate_confusion_matrix(self, y_test: pd.Series, y_pred: pd.Series) -> ndarray[tuple[int, int], dtype[any]]:
+    def _calculate_confusion_matrix(self, y_test: pd.Series, y_pred: pd.Series) -> ndarray[tuple[int, int], dtype[any]]:
         classes = [4, 2]  # define class labels (4 for malign and 2 for benign)
 
         confusion_matrix = np.zeros((len(classes), len(classes)), dtype=int)  # initialize confusion matrix
@@ -32,7 +32,7 @@ class Evaluator(ABC):
         This method takes a confusion matrix as input, plots it in a new figure and saves it as a png file.
     """
 
-    def plot_save_confusion_matrix(self, confusion_matrix: ndarray[tuple[int, int], dtype[any]], output_path: str):
+    def _plot_save_confusion_matrix(self, confusion_matrix: ndarray[tuple[int, int], dtype[any]], output_path: str):
         classes = [4, 2]  # Define class labels (4 for malign and 2 for benign)
         class_labels = ['Malign (4)', 'Benign (2)']
 
@@ -71,7 +71,7 @@ class Evaluator(ABC):
         and values represent their corresponding calculated values as described in the calculate_metrics method.
     """
 
-    def save_metrics(self, metrics: dict):
+    def _save_metrics(self, metrics: dict):
         import csv
         with open('output/result.csv', 'w') as fp:  # open the file in write mode
             csv.writer(fp).writerows(metrics.items())  # write the dictionary items as rows in the CSV file
@@ -82,7 +82,7 @@ class Evaluator(ABC):
         then it calculates the mean of each metric across all runs and writes the resulting averages to a CSV file.
     """
 
-    def save_metrics_from_metrics_list(self, metrics_list: list[dict]):
+    def _save_metrics_from_metrics_list(self, metrics_list: list[dict]):
         metric_sum = {}  # dictionary to store the cumulative sum of each metric
         metric_count = {}  # dictionary to store the count of values for each metric
 

@@ -51,8 +51,8 @@ class HoldoutEvaluator(Evaluator):
             print(e)                                                    # prints the exception
             sys.exit('Error to use holdout validation.')
 
-        self.save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
-        self.plot_save_confusion_matrix(self.calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
+        self._save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
+        self._plot_save_confusion_matrix(self._calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
 
 
     """
