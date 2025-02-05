@@ -132,6 +132,10 @@ class Evaluator:
     """
     def calculate_metrics(self, y_test: pd.Series, y_pred: pd.Series):
         try:
+            valid_metrics = {"1", "2", "3", "4", "5", "6", "7"}
+            if not set(self.__metrics).issubset(valid_metrics):                                                                 # Check if the metrics selected is correct
+                raise ValueError("Invalid metric. Allowed values are: 1, 2, 3, 4, 5, 6, 7.")
+
             true_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)                                   # Calculate the confusion matrix
             true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
             false_positive = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 4)
@@ -255,6 +259,8 @@ class Evaluator:
     """
     def split_data(self, training_percentage: float):
         try:
+            if not (0 < training_percentage < 1):                           # Check if training_percentage is between 0 e 1
+                raise ValueError("Training percentage must be between 0 and 1 (exclusive).")
             split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
 
             x_train = self.__features.iloc[:split_index]                    # Extract the training and test data
