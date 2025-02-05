@@ -6,7 +6,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./input:/input
-      - ./output:/output
+      - ./input:/app/input
+      - ./output:/app/output
     stdin_open: true
     tty: true
