@@ -1,6 +1,7 @@
 import sys
 from math import sqrt
 
+import numpy as np
 import pandas as pd
 from Evaluation.Evaluator import Evaluator
 
@@ -60,6 +61,8 @@ class HoldoutEvaluator(Evaluator):
     """
     def split_data(self, training_percentage: float):
         try:
+            if not (0 < training_percentage < 1):                           # Check if training_percentage is between 0 e 1
+                raise ValueError("Training percentage must be between 0 and 1 (exclusive).")
             split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
 
             x_train = self.__features.iloc[:split_index]                    # Extract the training and test data
@@ -82,6 +85,9 @@ class HoldoutEvaluator(Evaluator):
 
     def calculate_metrics(self, y_test: pd.Series, y_pred: pd.Series):
         try:
+            valid_metrics = {"1", "2", "3", "4", "5", "6", "7"}
+            if not set(self.__metrics).issubset(valid_metrics):                                                                 # Check if the metrics selected is correct
+                raise ValueError("Invalid metric. Allowed values are: 1, 2, 3, 4, 5, 6, 7.")
             true_positive = sum(
                 1 for y, pred in zip(y_test, y_pred) if y == 4 and pred == 4)  # Calculate the confusion matrix
             true_negative = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred == 2)
@@ -117,14 +123,27 @@ class HoldoutEvaluator(Evaluator):
                                                                                               true_negative + false_positive) > 0 else 0
                 geometric_mean = sqrt(sensitivity * specificity)
                 metrics['Geometric Mean'] = geometric_mean
-            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):  # Calculate AUC if selected
-                sensitivity = true_positive / (true_positive + false_negative) if (
-                                                                                              true_positive + false_negative) > 0 else 0
-                specificity = true_negative / (true_negative + false_positive) if (
-                                                                                              true_negative + false_positive) > 0 else 0
-                auc = (sensitivity + specificity) / 2
-                metrics['Area Under The Curve Rate'] = auc
+            if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):
+                fpr, tpr = [], []  # Initialize empty lists for False Positive Rate (FPR) and True Positive Rate (TPR)
+                thresholds = np.linspace(2, 4, 30)  # Beetween [2, 4]
 
+                for m in thresholds:
+                    tp = sum(1 for y, pred in zip(y_test, y_pred) if
+                             y == 4 and pred >= m)  # Calculate True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN) based on the threshold
+                    tn = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred < m)
+                    fp = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred >= m)
+                    fn = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred < m)
+                    tpr.append(tp / (tp + fn) if (
+                                                             tp + fn) > 0 else 0)  # Calculate TPR and FPR for the current threshold and append to the respective lists
+                    fpr.append(fp / (fp + tn) if (fp + tn) > 0 else 0)
+
+                sorted_indices = np.argsort(fpr)  # Sort FPR and TPR based on ascending FPR values
+                fpr = np.array(fpr)[sorted_indices]
+                tpr = np.array(tpr)[sorted_indices]
+
+                auc_value = np.trapz(tpr, fpr)  # Calculate Area Under the Curve (AUC) using the trapezoidal rule
+
+                metrics['Area Under The Curve Rate'] = auc_value  # Store the AUC value in the metrics dictionary
             return metrics
 
         except Exception as e:  # handles exception
