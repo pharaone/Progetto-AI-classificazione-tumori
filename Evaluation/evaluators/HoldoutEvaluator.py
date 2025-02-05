@@ -3,6 +3,7 @@ from math import sqrt
 
 import pandas as pd
 import Evaluation.EvaluatorUtilities as utilities
+from Evaluation.Evaluator import Evaluator
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
@@ -11,7 +12,7 @@ This class contains all the code needed to evaluate and export the evaluation da
 using different methods of validation:
 Holdout validation
 """
-class HoldoutValidation:
+class HoldoutEvaluator(Evaluator):
     __features : pd.DataFrame = None
     __targets : pd.Series = None
     """
@@ -26,22 +27,26 @@ class HoldoutValidation:
     }
     """
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str]):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str],
+                 k_neighbors: int, distance_strategy :int, training_percentage: float):
         self.__features = features
         self.__targets = targets
         self.__metrics = metrics
+        self.__k_neighbors = k_neighbors
+        self.__distance_strategy = distance_strategy
+        self.__training_percentage = training_percentage
 
     """
     Divides the dataset into training and test sets using the given percentage. 
     Trains the KNN model on the training set and evaluates its predictions on the test set.
     At the end calculate metrics that are crucial to understanding the model's overall performance
     """
-    def holdout_validation(self, training_percentage: float, k_neighbors: int, distance_strategy: int):
+    def evaluate(self):
         try:
             x_train, y_train, x_test, y_test = self.split_data(
-                training_percentage)                                    # Split the data into training and test sets
+                self.__training_percentage)                                    # Split the data into training and test sets
 
-            knn = KnnAlgorithm(k_neighbors, x_train, y_train, distance_strategy)           # Initialize the KNN classifier
+            knn = KnnAlgorithm(self.__k_neighbors, x_train, y_train, self.__distance_strategy)           # Initialize the KNN classifier
             y_pred = knn.predict(x_test)                                # Make predictions on the test data
         except Exception as e:                                          # handles every other exception
             print(e)                                                    # prints the exception
@@ -75,6 +80,7 @@ class HoldoutValidation:
         identified through numerical keys provided in the class.
         Depending on the selected numbers, the corresponding metrics are computed.
         """
+
     def calculate_metrics(self, y_test: pd.Series, y_pred: pd.Series):
         try:
             true_positive = sum(

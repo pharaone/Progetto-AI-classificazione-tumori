@@ -4,6 +4,7 @@ from math import sqrt
 import pandas as pd
 import numpy as np
 import Evaluation.EvaluatorUtilities as utilities
+from Evaluation.Evaluator import Evaluator
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
@@ -12,7 +13,7 @@ This class contains all the code needed to evaluate and export the evaluation da
 using different methods of validation:
 K-fold cross validation
 """
-class KFoldValidation:
+class KFoldEvaluator(Evaluator):
     __features : pd.DataFrame = None
     __targets : pd.Series = None
     """
@@ -27,32 +28,38 @@ class KFoldValidation:
     }
     """
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str]):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str],
+                 k_neighbors: int, distance_strategy :int, k_times: int):
         self.__features = features
         self.__targets = targets
         self.__metrics = metrics
+        self.__k_neighbors = k_neighbors
+        self.__distance_strategy = distance_strategy
+        self.__k_times = k_times
+        print("uykfkuyfkuy,giylfv")
 
     """
     This method divides the data into k (user inserted parameter) subsets for k-fold cross-validation.
     It trains the KNN model on k-1 subsets and evaluates on the remaining one for k times
     calculating metrics each time and averaging them across all folds.
     """
-    def k_fold_cross_validation(self, k_times: int, k_neighbors: int, distance_strategy: int):
+    def evaluate(self):
+        print("K-fold cross validation")
         # divide the features and targets into k subsets
-        features_subsets : [pd.DataFrame] = np.array_split(self.__features, k_times)
-        targets_subsets : [pd.Series] = np.array_split(self.__targets, k_times)
+        features_subsets : [pd.DataFrame] = np.array_split(self.__features, self.__k_times)
+        targets_subsets : [pd.Series] = np.array_split(self.__targets, self.__k_times)
 
         metrics = []                                                            # created an empty metrics array
 
         classes = [4, 2]
         confusion_matrix = np.zeros((len(classes), len(classes)), dtype=int)       # create the confusion matrix
 
-        for index in range(k_times):
+        for index in range(self.__k_times):
             # create a feature and a target set without the current index fold
             features_set = features_subsets.copy().pop(index)
             targets_set = targets_subsets.copy().pop(index)
 
-            knn = KnnAlgorithm(k_neighbors, features_set, targets_set, distance_strategy)          # creates an instance of the knn model
+            knn = KnnAlgorithm(self.__k_neighbors, features_set, targets_set, self.__distance_strategy)          # creates an instance of the knn model
             y_prediction = knn.predict(features_subsets[index])                 # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))   # calculates the requested metrics for this evaluation and appends them to the list
@@ -113,6 +120,7 @@ class KFoldValidation:
     """
     Splits the data into training and test sets based on the training percentage.
     """
+
     def split_data(self, training_percentage: float):
         try:
             split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage

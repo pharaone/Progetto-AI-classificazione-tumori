@@ -42,18 +42,21 @@ def main():
 
         if scelta == "1":
             training_percentage = float(input("Inserisci la percentuale di training (es. 0.8 per 80%): "))
-            holdout_evaluator = EvaluationFactory.get_holdout_evaluator(features, targets, metriche_selezionate)
-            holdout_evaluator.holdout_validation(training_percentage, k_neighbors, distanza_scelta)
+            holdout_evaluator = EvaluationFactory.get_holdout_evaluator(features, targets, metriche_selezionate, k_neighbors
+                                                                        , distanza_scelta, training_percentage)
+            holdout_evaluator.evaluate()
 
         elif scelta == "2":
             k_folds = int(input("Inserisci il numero di fold (es. 5): "))
-            k_fold_evaluator = EvaluationFactory.get_K_fold_evaluator(features, targets, metriche_selezionate)
-            k_fold_evaluator.k_fold_cross_validation(k_folds, k_neighbors, distanza_scelta)
+            k_fold_evaluator = EvaluationFactory.get_K_fold_evaluator(features, targets, metriche_selezionate, k_neighbors,
+                                                                       distanza_scelta, k_folds)
+            k_fold_evaluator.evaluate()
 
         elif scelta == "3":
             k_folds = int(input("Inserisci il numero di fold per la validazione stratificata (es. 5): "))
-            stratified_evaluator = EvaluationFactory.get_stratified_evaluator(features, targets, metriche_selezionate)
-            stratified_evaluator.stratified_cross_validation(k_folds, k_neighbors, distanza_scelta)
+            stratified_evaluator = EvaluationFactory.get_stratified_evaluator(features, targets, metriche_selezionate,
+                                                                              k_neighbors, distanza_scelta, k_folds)
+            stratified_evaluator.evaluate()
 
         else:
             print("Scelta non valida. Riprova.")

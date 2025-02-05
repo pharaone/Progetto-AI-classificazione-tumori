@@ -4,6 +4,7 @@ from math import sqrt
 import pandas as pd
 import numpy as np
 import Evaluation.EvaluatorUtilities as utilities
+from Evaluation.Evaluator import Evaluator
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
@@ -12,7 +13,7 @@ This class contains all the code needed to evaluate and export the evaluation da
 using different methods of validation:
 Stratified cross validation
 """
-class StratifiedValidation:
+class StratifiedEvaluator(Evaluator):
     __features : pd.DataFrame = None
     __targets : pd.Series = None
     """
@@ -27,17 +28,21 @@ class StratifiedValidation:
     }
     """
 
-    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str]):
+    def __init__(self, features: pd.DataFrame, targets: pd.Series, metrics: list[str],
+                 k_neighbors: int, distance_strategy :int, k_times:int):
         self.__features = features
         self.__targets = targets
         self.__metrics = metrics
+        self.__k_neighbors = k_neighbors
+        self.__distance_strategy = distance_strategy
+        self.__k_times = k_times
 
     """
     This method performs the stratified k-fold (k user defined parameter) cross-validation.
     It trains the KNN model on k-1 folds each with the same class distribution as the original set 
     and evaluates on the remaining one calculating metrics each time and averaging them across all folds.
     """
-    def stratified_cross_validation(self, k_times: int, k_neighbors: int, distance_strategy: int):
+    def stratified_cross_validation(self):
         unified_features_and_targets = self.__features.copy()                           # creates a copy of the features
         unified_features_and_targets['targets'] = self.__targets.copy()                 # adds the target column to the copy
         unified_features_and_targets.sort_values(by=['targets'], inplace=True)          # sorts everything by class
@@ -45,26 +50,26 @@ class StratifiedValidation:
         benign_dataset = unified_features_and_targets[unified_features_and_targets['targets'] == 2.0]       # extracts the benign dataset
         malign_dataset = unified_features_and_targets[unified_features_and_targets['targets'] == 4.0]       # extracts the malign dataset
 
-        benign_targets = np.array_split(benign_dataset['targets'], k_times)             # splits the benign targets in k folds
-        malign_targets = np.array_split(malign_dataset['targets'], k_times)             # splits the malign targets in k folds
+        benign_targets = np.array_split(benign_dataset['targets'], self.__k_times)             # splits the benign targets in k folds
+        malign_targets = np.array_split(malign_dataset['targets'], self.__k_times)             # splits the malign targets in k folds
 
         benign_dataset = benign_dataset.drop(columns=['targets'])                       # drops the targets column only used to split the benign and malingn
                                                                                         # sets more easily from the dataset
         malign_dataset = malign_dataset.drop(columns=['targets'])
 
-        benign_subsets: [pd.DataFrame] = np.array_split(benign_dataset, k_times)        # creates the subsets of the dataset
-        malign_subsets: [pd.DataFrame] = np.array_split(malign_dataset, k_times)        # creates the subsets of the dataset
+        benign_subsets: [pd.DataFrame] = np.array_split(benign_dataset, self.__k_times)        # creates the subsets of the dataset
+        malign_subsets: [pd.DataFrame] = np.array_split(malign_dataset, self.__k_times)        # creates the subsets of the dataset
 
         metrics = []                                                                    # created an empty metrics array
 
         classes = [4, 2]
         confusion_matrix = np.zeros((len(classes), len(classes)), dtype=int)     # create the confusion matrix
 
-        for index in range(k_times):
+        for index in range(self.__k_times):
             features_set = pd.concat([benign_subsets.copy().pop(index), malign_subsets.copy().pop(index)])          # unites benign and maling sets and removes the current index fold
             targets_set = pd.concat([benign_targets.copy().pop(index), malign_targets.copy().pop(index)])           # unites benign and maling sets and removes the current index fold
 
-            knn = KnnAlgorithm(k_neighbors, features_set, targets_set, distance_strategy)                                  # creates an instance of the knn model
+            knn = KnnAlgorithm(self.__k_neighbors, features_set, targets_set, self.__distance_strategy)                                  # creates an instance of the knn model
             y_prediction = knn.predict(pd.concat([benign_subsets[index], malign_subsets[index]]))       # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))           # calculates the requested metrics for this evaluation and appends them to the list
@@ -124,6 +129,7 @@ class StratifiedValidation:
     """
     Splits the data into training and test sets based on the training percentage.
     """
+
     def split_data(self, training_percentage: float):
         try:
             split_index = int(len(self.__features) * training_percentage)   # Calculate the index for splitting based on the training percentage
