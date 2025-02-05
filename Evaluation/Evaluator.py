@@ -164,24 +164,24 @@ class Evaluator:
                 geometric_mean = sqrt(sensitivity * specificity)
                 metrics['Geometric Mean'] = geometric_mean
             if self.__metrics.__contains__("6") or self.__metrics.__contains__("7"):
-                fpr, tpr = [], []
-                thresholds = np.linspace(2, 4, 30)  # Intervallo [2, 4]
+                fpr, tpr = [], []                                                               # Initialize empty lists for False Positive Rate (FPR) and True Positive Rate (TPR)
+                thresholds = np.linspace(2, 4, 30)                              # Beetween [2, 4]
 
                 for m in thresholds:
-                    tp = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred >= m)
+                    tp = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred >= m)      # Calculate True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN) based on the threshold
                     tn = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred < m)
                     fp = sum(1 for y, pred in zip(y_test, y_pred) if y == 2 and pred >= m)
                     fn = sum(1 for y, pred in zip(y_test, y_pred) if y == 4 and pred < m)
-                    tpr.append(tp / (tp + fn) if (tp + fn) > 0 else 0)
+                    tpr.append(tp / (tp + fn) if (tp + fn) > 0 else 0)                          # Calculate TPR and FPR for the current threshold and append to the respective lists
                     fpr.append(fp / (fp + tn) if (fp + tn) > 0 else 0)
 
-                sorted_indices = np.argsort(fpr)
+                sorted_indices = np.argsort(fpr)                                                # Sort FPR and TPR based on ascending FPR values
                 fpr = np.array(fpr)[sorted_indices]
                 tpr = np.array(tpr)[sorted_indices]
 
-                auc_value = np.trapz(tpr, fpr)
+                auc_value = np.trapz(tpr, fpr)                                                  # Calculate Area Under the Curve (AUC) using the trapezoidal rule
 
-                metrics['Area Under The Curve Rate'] = auc_value
+                metrics['Area Under The Curve Rate'] = auc_value                                # Store the AUC value in the metrics dictionary
             return metrics
 
         except Exception as e:                                                                   # handles exception
