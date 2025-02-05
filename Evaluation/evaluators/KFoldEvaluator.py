@@ -3,7 +3,6 @@ from math import sqrt
 
 import pandas as pd
 import numpy as np
-import Evaluation.EvaluatorUtilities as utilities
 from Evaluation.Evaluator import Evaluator
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
@@ -63,10 +62,10 @@ class KFoldEvaluator(Evaluator):
             y_prediction = knn.predict(features_subsets[index])                 # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))   # calculates the requested metrics for this evaluation and appends them to the list
-            confusion_matrix += utilities.calculate_confusion_matrix(targets_set, y_prediction)      # add the data from the current run to the confusion matrix
+            confusion_matrix += self.calculate_confusion_matrix(targets_set, y_prediction)      # add the data from the current run to the confusion matrix
 
-        utilities.plot_save_confusion_matrix(confusion_matrix, "output/mean_confusion_matrix.jpg")      # plot and save the confusion matrix
-        utilities.save_metrics_from_metrics_list(metrics)                            # saves to file the requested metrics
+        self.plot_save_confusion_matrix(confusion_matrix, "output/mean_confusion_matrix.jpg")      # plot and save the confusion matrix
+        self.save_metrics_from_metrics_list(metrics)                            # saves to file the requested metrics
 
     """
     Calculates the main evaluation metrics for the KNN model: 

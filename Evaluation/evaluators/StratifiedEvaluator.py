@@ -3,7 +3,6 @@ from math import sqrt
 
 import pandas as pd
 import numpy as np
-import Evaluation.EvaluatorUtilities as utilities
 from Evaluation.Evaluator import Evaluator
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
@@ -42,7 +41,7 @@ class StratifiedEvaluator(Evaluator):
     It trains the KNN model on k-1 folds each with the same class distribution as the original set 
     and evaluates on the remaining one calculating metrics each time and averaging them across all folds.
     """
-    def stratified_cross_validation(self):
+    def evaluate(self):
         unified_features_and_targets = self.__features.copy()                           # creates a copy of the features
         unified_features_and_targets['targets'] = self.__targets.copy()                 # adds the target column to the copy
         unified_features_and_targets.sort_values(by=['targets'], inplace=True)          # sorts everything by class
@@ -73,10 +72,10 @@ class StratifiedEvaluator(Evaluator):
             y_prediction = knn.predict(pd.concat([benign_subsets[index], malign_subsets[index]]))       # runs the prediction
 
             metrics.append(self.calculate_metrics(targets_set, y_prediction))           # calculates the requested metrics for this evaluation and appends them to the list
-            confusion_matrix += utilities.calculate_confusion_matrix(targets_set, y_prediction)              # add the data from the current run to the confusion matrix
+            confusion_matrix += self.calculate_confusion_matrix(targets_set, y_prediction)              # add the data from the current run to the confusion matrix
 
-        utilities.plot_save_confusion_matrix(confusion_matrix, "output/mean_confusion_matrix.jpg")   # plots and saves the confusion matrix
-        utilities.save_metrics_from_metrics_list(metrics)                                    # saves to file the requested metrics
+        self.plot_save_confusion_matrix(confusion_matrix, "output/mean_confusion_matrix.jpg")   # plots and saves the confusion matrix
+        self.save_metrics_from_metrics_list(metrics)                                    # saves to file the requested metrics
 
     """
     Calculates the main evaluation metrics for the KNN model: 

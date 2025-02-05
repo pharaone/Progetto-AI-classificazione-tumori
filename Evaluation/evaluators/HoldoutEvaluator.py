@@ -2,7 +2,6 @@ import sys
 from math import sqrt
 
 import pandas as pd
-import Evaluation.EvaluatorUtilities as utilities
 from Evaluation.Evaluator import Evaluator
 
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
@@ -52,8 +51,8 @@ class HoldoutEvaluator(Evaluator):
             print(e)                                                    # prints the exception
             sys.exit('Error to use holdout validation.')
 
-        utilities.save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
-        utilities.plot_save_confusion_matrix(utilities.calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
+        self.save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
+        self.plot_save_confusion_matrix(self.calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
 
 
     """
