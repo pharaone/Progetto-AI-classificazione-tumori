@@ -11,9 +11,10 @@
 8. [Conclusione](#8-conclusione)
 
 ### 1. Introduzione
-Il progetto è stato sviluppato da Emanuele Antonio Faraone (@pharaone) e Stefano Imbalzano per il corso di Fondamenti di Intelligenza Artificiale (2024-2025).
-Questo programma addestra e valuta le prestazioni di un classificatore di machine learning adatto a classificare i tumori come benigni o maligni in base alle caratteristiche fornite. 
-Riceve in input un file .csv contenente il dataset che "preprocessa" per dividerlo in features e target label e per pulirlo da eventuali errori, poi addestra il classificatore k-nn con le caratteristiche che vengono fornite in input dall'utilizzatore ed ne valuta le performance utilizzando 3 diverse tecniche di divisione del dataset in training e test: Holdout, K-fold Cross Validation e Stratified Cross Validation.
+Il progetto è stato sviluppato da Emanuele Antonio Faraone (@pharaone) e Stefano Imbalzano per il corso di Fondamenti di Intelligenza Artificiale (2024-2025).  
+
+Questo programma addestra e valuta le prestazioni di un classificatore di machine learning adatto a classificare i tumori come benigni o maligni in base alle caratteristiche fornite.  
+Riceve in input un file .csv contenente il dataset che "preprocessa" per dividerlo in features e target label e per pulirlo da eventuali errori, poi addestra il classificatore k-nn con le caratteristiche che vengono fornite in input dall'utilizzatore ed ne valuta le performance utilizzando una di 3 diverse tecniche di divisione del dataset in training e test: Holdout, K-fold Cross Validation e Stratified Cross Validation.
 
 ### 2. Esecuzione del progetto 
 É possibile eseguire il progetto sia eseguendo il file main.py via shell, oppure tramite container docker. Per le istruzioni Docker vai al paragrafo [Docker](#7-docker).
@@ -40,7 +41,8 @@ Una volta caricato il dataset, è necessario effettuare un processo di pulizia. 
 
 
 - __Standardizzazione dei Dati__:
-Per garantire che i dati siano comparabili tra loro, è importante applicare una tecnica di standardizzazione. In questa fase, ogni colonna numerica viene trasformata in modo che abbia media pari a zero e deviazione standard pari a uno. Questo processo è particolarmente utile quando le variabili hanno scale diverse e aiuta i modelli a convergere più rapidamente durante l'addestramento. La colonna che rappresenta la variabile target viene esclusa dalla standardizzazione, poiché il suo valore deve rimanere inalterato.
+Per garantire che i dati siano comparabili tra loro, è importante applicare una tecnica di standardizzazione. In questa fase, ogni colonna numerica viene trasformata in modo che abbia media pari a zero e deviazione standard pari a uno. 
+Questo processo è particolarmente utile quando le variabili hanno scale diverse e aiuta i modelli a convergere più rapidamente durante l'addestramento. La colonna che rappresenta la variabile target viene esclusa dalla standardizzazione, poiché il suo valore deve rimanere inalterato.
 
 
 - __Separazione di Feature e Target__:
@@ -52,15 +54,15 @@ Per garantire che i dati siano comparabili tra loro, è importante applicare una
 Il preprocessing è una fase determinante, perché permette di ottenere dati coerenti, privi di errori e ben strutturati, migliorando così l'efficacia del modello predittivo.
 
 ### 4. K-nearest neighbors Algorithm (KNN)
-L'__algoritmo dei k-nearest neighbors (KNN)__ è un metodo di classificazione supervisionata che classifica un elemento sulla base della classe più frequente tra i suoi k vicini più prossimi. Il nostro programma implementa un classificatore KNN personalizzato, 
-il quale permette di selezionare diverse strategie di distanza per il calcolo della similarità tra i punti del dataset.
+L'__algoritmo dei k-nearest neighbors (KNN)__ è un metodo di classificazione supervisionata che classifica un elemento sulla base della classe più frequente tra i suoi k vicini più prossimi.  
+Il nostro programma implementa un classificatore KNN personalizzato, il quale permette di selezionare diverse strategie di distanza per il calcolo della similarità tra i punti del dataset.
 L'implementazione prevede:
 - __Ricerca dei vicini più prossimi__: Per ogni punto di test, viene calcolata la distanza rispetto a tutti i punti del dataset di training utilizzando la strategia di distanza selezionata. I k elementi più vicini vengono scelti in base alle distanze più piccole.
-- __Scelta della strategia di distanza__: Il sistema utilizza un'architettura basata sul design pattern Factory con Strategy, che consente di selezionare dinamicamente il metodo di calcolo della distanza. Questo approccio garantisce una maggiore flessibilità, facilitando l'integrazione di nuove strategie di distanza senza modificare il codice esistente. Attualmente è implementata la distanza euclidea. 
+- __Scelta della strategia di distanza__: Il sistema utilizza un'architettura basata sul design pattern Factory con Strategy, che consente di selezionare dinamicamente il metodo di calcolo della distanza. Questo approccio garantisce una maggiore flessibilità, facilitando l'integrazione di nuove strategie di distanza senza modificare il codice esistente. Attualmente è implementata la distanza euclidea.  
 Tuttavia, grazie alla struttura del Factory, è possibile aggiungere facilmente nuove metriche di distanza, come la distanza di Manhattan o la distanza di Minkowski, semplicemente implementando nuove strategie senza alterare il flusso principale dell'algoritmo.
 - __Classificazione__: Una volta individuati i k vicini più prossimi, la classe viene assegnata in base alla maggioranza tra le etichette dei vicini. In caso di parità tra classi, il programma sceglie casualmente una delle classi con il numero massimo di occorrenze.
 
-Il parametro "k" rappresenta il numero di vicini da prendere in considerazione per il processo di classificazione. Se si imposta k=1, l'oggetto da classificare viene associato alla categoria del punto più vicino. La scelta ottimale di "k" è cruciale per bilanciare correttamente l'accuratezza del modello e la sua capacità di generalizzazione. 
+Il parametro "k" rappresenta il numero di vicini da prendere in considerazione per il processo di classificazione. Se si imposta k=1, l'oggetto da classificare viene associato alla categoria del punto più vicino. La scelta ottimale di "k" è cruciale per bilanciare correttamente l'accuratezza del modello e la sua capacità di generalizzazione.  
 L'implementazione include inoltre il controllo degli errori per garantire che i parametri utilizzati (ad esempio, il numero di vicini k e la strategia di distanza) siano validi. In caso di errore, il programma gestisce le eccezioni e termina con un messaggio appropriato.
 
 ### 5. Validazione del modello e metriche calcolate
@@ -72,12 +74,12 @@ Per valutare le prestazioni del classificatore, il programma implementa tre tecn
     Successivamente, il modello addestrato viene utilizzato per fare previsioni sull'insieme di test, che non è stato visto durante la fase di addestramento, permettendo di valutare le sue capacità di generalizzazione.
     Una volta ottenute le previsioni, si procede con il calcolo di metriche di valutazione fondamentali per comprendere le prestazioni del modello.
   
-- __K-Fold Cross Validation__: Il dataset viene suddiviso in k sottoinsiemi (folds) di uguali dimensioni (o quando non è possibile, di dimensioni simili). 
-Il modello viene addestrato su k-1 di questi sottoinsiemi e testato sull’ultimo rimanente, ripetendo questo processo k volte, cambiando il fold di test ogni volta.
-Alla fine, le metriche di valutazione vengono mediate su tutte le iterazioni per ottenere una stima più affidabile delle prestazioni. 
+- __K-Fold Cross Validation__: Il dataset viene suddiviso in k sottoinsiemi (folds) di uguali dimensioni (o quando non è possibile, di dimensioni simili), dopodiché il modello viene addestrato su k-1 di questi sottoinsiemi e testato sull’ultimo rimanente, ripetendo questo processo k volte, cambiando il fold di test ogni volta.
+  
+  Alla fine, le metriche di valutazione vengono mediate su tutte le iterazioni per ottenere una stima più affidabile delle prestazioni.  
 Questo metodo è utile per ridurre il rischio di overfitting rispetto alla semplice suddivisione tra training e test set, poiché il modello viene trainato e testato su diverse parti del dataset.
 
-- __Stratified Cross Validation__: E' una variante del k-fold che mantiene la distribuzione originale delle classi in ogni fold. Questo è particolarmente utile per dataset sbilanciati, in cui alcune classi sono molto più frequenti di altre.
+- __Stratified Cross Validation__: E' una variante del k-fold che mantiene la distribuzione originale delle classi in ogni fold. Questo è particolarmente utile per dataset sbilanciati, in cui alcune classi sono molto più frequenti di altre.  
  La procedura è la stessa del k-fold, ma la suddivisione in fold avviene in modo che la proporzione delle classi sia simile a quella dell’intero dataset.
 
 Le metriche di valutazione disponibili sono:
@@ -99,7 +101,7 @@ Le metriche di valutazione disponibili sono:
 - __All the above__: Opzione per calcolare e visualizzare tutte le metriche sopra elencate in una sola analisi.
 
 ### 6. Risultati
-Dopo l'esecuzione della valutazione, il programma produce due output principali. Il primo è un file CSV che contiene i valori delle metriche selezionate, calcolati in base alle predizioni effettuate dal modello. Questo file permette di analizzare le prestazioni del modello in modo dettagliato e quantitativo. 
+Dopo l'esecuzione della valutazione, il programma produce due output principali. Il primo è un file CSV che contiene i valori delle metriche selezionate, calcolati in base alle predizioni effettuate dal modello. Questo file permette di analizzare le prestazioni del modello in modo dettagliato e quantitativo.  
 Il secondo output è un plot della matrice di confusione, salvato come immagine, che fornisce una rappresentazione visiva degli errori e delle corrette classificazioni effettuate. Questo grafico aiuta a comprendere meglio il comportamento del modello, specialmente in presenza di classi sbilanciate.
 
 ### 7. Docker
@@ -127,6 +129,7 @@ Questo progetto utilizza Docker Compose per eseguire un ambiente isolato in cui 
 
 
 ### 8. Conclusione
-In conclusione, questo progetto offre un ambiente potente e interattivo per la classificazione dei dati medici, con un focus particolare sull'uso dell'algoritmo KNN. La struttura del progetto è progettata per garantire un'ampia flessibilità, permettendo agli utenti di personalizzare e ottimizzare il modello a seconda delle esigenze specifiche del loro dataset. 
-Ogni fase del processo, dal preprocessing dei dati all'addestramento del modello, fino alla validazione, è pensata per offrire una solida base di lavoro che consenta di ottenere risultati accurati e significativi.
+In conclusione, questo progetto offre un ambiente potente e interattivo per la classificazione dei dati medici, con un focus particolare sull'uso dell'algoritmo KNN. La struttura del progetto è progettata per garantire un'ampia flessibilità, permettendo agli utenti di personalizzare e ottimizzare il modello a seconda delle esigenze specifiche del loro dataset.  
+Ogni fase del processo, dal preprocessing dei dati all'addestramento del modello, fino alla validazione, è pensata per offrire una solida base di lavoro che consenta di ottenere risultati accurati e significativi.  
+
 Nel complesso, il progetto fornisce un workflow completo e strutturato, che aiuta non solo a sviluppare modelli di classificazione efficaci, ma anche a comprenderne a fondo il comportamento e le prestazioni. Questo è particolarmente importante in ambito medico, dove la precisione e l'affidabilità delle previsioni possono avere un impatto diretto sulla diagnosi e sul trattamento dei pazienti.
