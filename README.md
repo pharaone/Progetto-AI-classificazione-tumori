@@ -7,19 +7,24 @@
 4. [K-nearest neighbors Algorithm (KNN)](#4-k-nearest-neighbors-algorithm-knn)
 5. [Validazione del modello e metriche calcolate](#5-validazione-del-modello-e-metriche-calcolate)
 6. [Risultati](#6-risultati)
-7. [Conclusione](#7-conclusione)
+7. [Docker](#7-docker)
+8. [Conclusione](#8-conclusione)
 
 ### 1. Introduzione
 Il progetto è stato sviluppato da Emanuele Antonio Faraone (@pharaone) e Stefano Imbalzano per il corso di Fondamenti di Intelligenza Artificiale (2024-2025).
 Questo programma addestra e valuta le prestazioni di un classificatore di machine learning adatto a classificare i tumori come benigni o maligni in base alle caratteristiche fornite. 
 Riceve in input un file .csv contenente il dataset che "preprocessa" per dividerlo in features e target label e per pulirlo da eventuali errori, poi addestra il classificatore k-nn con le caratteristiche che vengono fornite in input dall'utilizzatore ed ne valuta le performance utilizzando 3 diverse tecniche di divisione del dataset in training e test: Holdout, K-fold Cross Validation e Stratified Cross Validation.
 
-### 2. Esecuzione del progetto
-Durante l'esecuzione, l'utente è tenuto a specificare diversi parametri:
+### 2. Esecuzione del progetto 
+É possibile eseguire il progetto sia eseguendo il file main.py via shell, oppure tramite container docker. Per le istruzioni Docker vai al paragrafo [Docker](#7-docker).
+
+Durante l'esecuzione tramite shell, l'utente è tenuto a specificare diversi parametri:
 - Numero di vicini (k) da utilizzare per la classificazione.
 - Metodo di validazione del modello (Holdout, K-Fold Cross Validation, Stratified Cross Validation).
 - Numero di fold nel caso di K-Fold o Stratified Cross Validation.
 - Metriche di valutazione da calcolare.
+
+É necessario inserire il .csv con il dataset in una cartella denominata input all'interno della root del progetto, è inoltre necessario creare una cartella output in cui verranno salvati i risultati.
 
 ### 3. Preprocessing del dataset
 Il preprocessing dei dati è una fase cruciale nel ciclo di vita di un modello di machine learning. Questa fase permette di trasformare i dati grezzi in un formato più pulito, strutturato e adatto all'analisi. Il processo si sviluppa in diverse fasi fondamentali, che vanno dal caricamento del dataset fino alla separazione delle variabili di input (feature) e della variabile target.
@@ -96,7 +101,32 @@ Le metriche di valutazione disponibili sono:
 ### 6. Risultati
 Dopo l'esecuzione della valutazione, il programma produce due output principali. Il primo è un file CSV che contiene i valori delle metriche selezionate, calcolati in base alle predizioni effettuate dal modello. Questo file permette di analizzare le prestazioni del modello in modo dettagliato e quantitativo. 
 Il secondo output è un plot della matrice di confusione, salvato come immagine, che fornisce una rappresentazione visiva degli errori e delle corrette classificazioni effettuate. Questo grafico aiuta a comprendere meglio il comportamento del modello, specialmente in presenza di classi sbilanciate.
-### 7. Conclusione
+
+### 7. Docker
+Questo progetto utilizza Docker Compose per eseguire un ambiente isolato in cui il codice viene eseguito automaticamente con i parametri configurabili. Per avviare il progetto, devi:
+- #### Requisiti
+  Assicurati di avere Docker e Docker compose installati sul tuo sistema
+- #### Configurazione del file .env
+  Il file .env permette di personalizzare i parametri senza modificare il codice, crealo o modifica quello già esistente per modificare:  
+  - Metodo di valutazione (1 = Holdout, 2 = K-Fold, 3 = Stratified)  
+  - Numero di vicini per l'algoritmo KNN  
+  - Selezione delle metriche da calcolare 
+  - Strategia di distanza  
+  - Parametri specifici per le tecniche di valutazione
+- #### Cartelle input, output
+  Assicurati di avere creato nella root del progetto le cartelle input/ ed output/ che saranno montate dal container.
+  Assicurati inoltre di avere rinominato in csv in input come input.csv
+
+- #### Avviare il progetto
+  Una volta configurato il file .env, avvia il progetto con:
+  
+  docker-compose up --build
+
+- #### Risultati
+  I risultati dell'elaborazione vengono salvati automaticamente nella cartella output/ sulla tua macchina locale
+
+
+### 8. Conclusione
 In conclusione, questo progetto offre un ambiente potente e interattivo per la classificazione dei dati medici, con un focus particolare sull'uso dell'algoritmo KNN. La struttura del progetto è progettata per garantire un'ampia flessibilità, permettendo agli utenti di personalizzare e ottimizzare il modello a seconda delle esigenze specifiche del loro dataset. 
 Ogni fase del processo, dal preprocessing dei dati all'addestramento del modello, fino alla validazione, è pensata per offrire una solida base di lavoro che consenta di ottenere risultati accurati e significativi.
 Nel complesso, il progetto fornisce un workflow completo e strutturato, che aiuta non solo a sviluppare modelli di classificazione efficaci, ma anche a comprenderne a fondo il comportamento e le prestazioni. Questo è particolarmente importante in ambito medico, dove la precisione e l'affidabilità delle previsioni possono avere un impatto diretto sulla diagnosi e sul trattamento dei pazienti.
