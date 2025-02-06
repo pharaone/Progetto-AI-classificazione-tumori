@@ -24,7 +24,7 @@ Durante l'esecuzione, l'utente è tenuto a specificare diversi parametri:
 ### 3. Preprocessing del dataset
 Il preprocessing dei dati è una fase cruciale nel ciclo di vita di un modello di machine learning. Questa fase permette di trasformare i dati grezzi in un formato più pulito, strutturato e adatto all'analisi. Il processo si sviluppa in diverse fasi fondamentali, che vanno dal caricamento del dataset fino alla separazione delle variabili di input (feature) e della variabile target.
 - __Caricamento del Dataset__:
-La prima operazione consiste nel leggere i dati da un file di input. È fondamentale gestire eventuali errori di caricamento, come l'assenza del file o la presenza di formati non compatibili. Questa fase garantisce che il dataset sia disponibile in memoria sotto forma di una tabella strutturata, solitamente rappresentata come un DataFrame.
+La prima operazione consiste nel leggere i dati da un file di input. È fondamentale gestire eventuali errori di caricamento, come l'assenza del file o la presenza di formati non compatibili. Questa fase garantisce che il dataset sia disponibile in memoria sotto forma di una tabella strutturata.
 
 
 - __Pulizia dei Dati__:
@@ -66,9 +66,12 @@ Per valutare le prestazioni del classificatore, il programma implementa tre tecn
     
     Successivamente, il modello addestrato viene utilizzato per fare previsioni sull'insieme di test, che non è stato visto durante la fase di addestramento, permettendo di valutare le sue capacità di generalizzazione.
     Una volta ottenute le previsioni, si procede con il calcolo di metriche di valutazione fondamentali per comprendere le prestazioni del modello.
-- __K-Fold Cross Validation__:  E' una tecnica di validazione per valutare la performance di un modello di machine learning. Il dataset viene suddiviso in k sottoinsiemi (folds) di dimensioni simili. 
-Il modello viene addestrato su k-1 di questi sottoinsiemi e testato sull’ultimo rimanente. Questo processo si ripete k volte, cambiando il fold di test ogni volta. Alla fine, le metriche di valutazione vengono mediate su tutte le iterazioni per ottenere una stima più affidabile delle prestazioni. 
-Questo metodo è utile per ridurre il rischio di overfitting rispetto alla semplice suddivisione tra training e test set, poiché il modello viene testato su diverse parti del dataset.
+  
+- __K-Fold Cross Validation__: Il dataset viene suddiviso in k sottoinsiemi (folds) di uguali dimensioni (o quando non è possibile, di dimensioni simili). 
+Il modello viene addestrato su k-1 di questi sottoinsiemi e testato sull’ultimo rimanente, ripetendo questo processo k volte, cambiando il fold di test ogni volta.
+Alla fine, le metriche di valutazione vengono mediate su tutte le iterazioni per ottenere una stima più affidabile delle prestazioni. 
+Questo metodo è utile per ridurre il rischio di overfitting rispetto alla semplice suddivisione tra training e test set, poiché il modello viene trainato e testato su diverse parti del dataset.
+
 - __Stratified Cross Validation__: E' una variante del k-fold che mantiene la distribuzione originale delle classi in ogni fold. Questo è particolarmente utile per dataset sbilanciati, in cui alcune classi sono molto più frequenti di altre.
  La procedura è la stessa del k-fold, ma la suddivisione in fold avviene in modo che la proporzione delle classi sia simile a quella dell’intero dataset.
 
