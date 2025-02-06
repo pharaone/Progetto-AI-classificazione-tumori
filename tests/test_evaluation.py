@@ -1,8 +1,12 @@
 import unittest
+
+import numpy as np
 import pandas as pd
 
 from Evaluation.Evaluator import Evaluator
 from Evaluation.evaluators.HoldoutEvaluator import HoldoutEvaluator
+from Evaluation.evaluators.KFoldEvaluator import KFoldEvaluator
+from Evaluation.evaluators.StratifiedEvaluator import StratifiedEvaluator
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
 
@@ -24,14 +28,14 @@ class TestEvaluator(unittest.TestCase):
     Splitting data into training and test sets.
     Ensuring the split respects the specified training percentage.
     Training a KNN model and verifying its predictions have the correct length.
+    Then runs the evaluate method to ensure no exceptions are raised.
     """
     def test_holdout_validation(self):
         training_percentage = 0.67  # Percentage of the dataset used for training
         k_neighbors = 3  # Number of neighbors to consider
+        evaluator = HoldoutEvaluator(self.features, self.targets, self.metrics, k_neighbors, self.distance_strategy, training_percentage)
 
-        self.evaluator = HoldoutEvaluator(self.features, self.targets, self.metrics, self.distance_strategy, k_neighbors, training_percentage)
-
-        x_train, y_train, x_test, y_test = self.evaluator.split_data(training_percentage)   # Split the data into training and test sets
+        x_train, y_train, x_test, y_test = evaluator.split_data(training_percentage)   # Split the data into training and test sets
 
         self.assertEqual(len(x_train), int(len(self.features) * training_percentage))       # Check that the number of elements in training and test sets is correct
         self.assertEqual(len(x_test), len(self.features) - len(x_train))
@@ -44,6 +48,39 @@ class TestEvaluator(unittest.TestCase):
         knn = KnnAlgorithm(k_neighbors, x_train, y_train, self.distance_strategy)           # Train and predict using KNN
         y_pred = knn.predict(x_test)
         self.assertEqual(len(y_pred), len(y_test))                                          # Check prediction length
+
+        evaluator.evaluate()  # Runs the evaluation and ensures no exceptions are raised
+
+        self.assertTrue(True)  # if the code reaches this line, the evaluation has run with no problems
+
+
+    """
+    This test runs the entire k fold evaluation and ensures no exceptions are raised.
+    """
+    def test_kfold_validation(self):
+        k_folds = 3
+        k_neighbors = 3
+
+        evaluator = KFoldEvaluator(self.features, self.targets, self.metrics, k_neighbors, self.distance_strategy,
+                                   k_folds)             # creo un'instanza di KFoldEvaluator
+
+        evaluator.evaluate()  # Runs the evaluation and ensures no exceptions are raised
+
+        self.assertTrue(True) # if the code reaches this line, the evaluation has run with no problems
+
+    """
+        This test runs the entire k fold evaluation and ensures no exceptions are raised.
+    """
+    def test_stratified_validation(self):
+        k_folds = 3
+        k_neighbors = 3
+
+        evaluator = StratifiedEvaluator(self.features, self.targets, self.metrics, k_neighbors, self.distance_strategy,
+                                        k_folds)        # creo un'instanza di Stratified Evaluator
+
+        evaluator.evaluate()  # Runs the evaluation and ensures no exceptions are raised
+
+        self.assertTrue(True)  # if the code reaches this line, the evaluation has run with no problems
 
     """
     Test the calculation of evaluation metrics, including:

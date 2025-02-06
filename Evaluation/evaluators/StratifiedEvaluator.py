@@ -9,8 +9,7 @@ from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
 """
 This class contains all the code needed to evaluate and export the evaluation data of the model
-using different methods of validation:
-Stratified cross validation
+using stratified cross validation, it extends the Evaluator class
 """
 class StratifiedEvaluator(Evaluator):
     __features : pd.DataFrame = None

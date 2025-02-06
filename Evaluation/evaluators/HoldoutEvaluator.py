@@ -8,9 +8,8 @@ from Evaluation.Evaluator import Evaluator
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
 """
-This class contains all the code needed to evaluate and export the evaluation data of the model
-using different methods of validation:
-Holdout validation
+This class extends the class Evaluator and contains all the code needed to evaluate and export the evaluation data of the model
+using Holdout validation
 """
 class HoldoutEvaluator(Evaluator):
     __features : pd.DataFrame = None
@@ -53,7 +52,7 @@ class HoldoutEvaluator(Evaluator):
             sys.exit('Error to use holdout validation.')
 
         self._save_metrics(self.calculate_metrics(y_test, y_pred))       # calculate and return the evaluation metrics
-        self._plot_save_confusion_matrix(self._calculate_confusion_matrix(y_test, y_pred), "output/plot.jpg")     # plot and save the confusion matrix
+        self._plot_save_confusion_matrix(self._calculate_confusion_matrix(y_test, y_pred), "output/mean_confusion_matrix.jpg")     # plot and save the confusion matrix
 
 
     """

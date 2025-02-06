@@ -8,9 +8,8 @@ from Evaluation.Evaluator import Evaluator
 from KNNAlgorithm.KnnAlgorithm import KnnAlgorithm
 
 """
-This class contains all the code needed to evaluate and export the evaluation data of the model
-using different methods of validation:
-K-fold cross validation
+This class extends the class Evaluator and contains all the code needed to evaluate and export the evaluation data of the model
+using K-fold cross validation
 """
 class KFoldEvaluator(Evaluator):
     __features : pd.DataFrame = None
@@ -35,7 +34,6 @@ class KFoldEvaluator(Evaluator):
         self.__k_neighbors = k_neighbors
         self.__distance_strategy = distance_strategy
         self.__k_times = k_times
-        print("uykfkuyfkuy,giylfv")
 
     """
     This method divides the data into k (user inserted parameter) subsets for k-fold cross-validation.

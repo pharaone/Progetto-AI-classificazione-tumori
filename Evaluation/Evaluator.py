@@ -5,7 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy import ndarray, dtype
 
+"""
+This class contains the definition of the abstract method evaluate and many useful methods for evaluation.
+Every Evaluator (Holdout, K-fold, Stratified) should extend it and override the evaluate method.
+"""
 class Evaluator(ABC):
+
+    """
+    This is the method every evaluator extends and which starts the evaluation process.
+    It does not take any input, all inputs are given to the constructors.
+    """
     @abstractmethod
     def evaluate(self):
         pass
